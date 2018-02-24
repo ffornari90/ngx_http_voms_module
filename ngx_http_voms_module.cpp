@@ -46,6 +46,8 @@ ngx_module_t ngx_http_voms_module = {
     NGX_MODULE_V1_PADDING  //
 };
 
+static std::unique_ptr<vomsdata> vomsdata_ptr;
+
 static ngx_int_t get_voms_fqans(  //
     ngx_http_request_t* r,
     ngx_http_variable_value_t* v,
@@ -139,25 +141,27 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
     return boost::none;
   }
 
-  vomsdata vd;
-  auto ok = vd.Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
+  if (!vomsdata_ptr) {
+    vomsdata_ptr.reset(new vomsdata);
+  }
+  auto ok = vomsdata_ptr->Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
   if (!ok) {
     // vd.error is not interpreted correctly by the logger, which probably uses
     // errno
     ngx_log_error(NGX_LOG_ERR,
                   r->connection->log,
-                  vd.error,
+                  vomsdata_ptr->error,
                   "%s",
-                  vd.ErrorMessage().c_str());
+                  vomsdata_ptr->ErrorMessage().c_str());
     return boost::none;
   }
 
-  if (vd.data.empty()) {
+  if (vomsdata_ptr->data.empty()) {
     ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "no ACs in proxy");
     return boost::none;
   }
 
-  return vd.data.front();
+  return vomsdata_ptr->data.front();
 }
 
 static void clean_voms_ac(void* data)
@@ -219,7 +223,7 @@ static ngx_int_t get_voms_fqans(ngx_http_request_t* r,
     return NGX_OK;
   }
 
-  auto fqans = boost::algorithm::join(ac->fqans, ",");
+  auto fqans = boost::algorithm::join(ac->fqan, ",");
 
   auto data = static_cast<u_char*>(ngx_pnalloc(r->pool, fqans.size()));
   if (!data) {
