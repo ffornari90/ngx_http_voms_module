@@ -1,7 +1,7 @@
 ngx_module_type=HTTP
 ngx_addon_name=voms
 ngx_module_name=ngx_http_voms_module
-ngx_module_srcs="$ngx_addon_dir/ngx_http_voms_module.cpp"
+ngx_module_srcs="$ngx_addon_dir/src/ngx_http_voms_module.cpp"
 ngx_module_libs="-lvomsapi -lstdc++"
 
 . auto/module
