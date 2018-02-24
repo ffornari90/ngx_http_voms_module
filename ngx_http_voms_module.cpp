@@ -92,29 +92,6 @@ static ngx_int_t add_variables(ngx_conf_t* cf)
   return NGX_OK;
 }
 
-template <class S>
-static std::string to_string(S const* s)
-{
-  return std::string(reinterpret_cast<char const*>(s->data),
-                     reinterpret_cast<char const*>(s->data) + s->len);
-}
-
-boost::optional<std::string> to_pem(X509& x509)
-{
-  BioPtr bio{BIO_new(BIO_s_mem()), BIO_free};
-  if (PEM_write_bio_X509(bio.get(), &x509) == 0) {
-    return boost::none;
-  } else {
-    char* data = nullptr;
-    auto len = BIO_get_mem_data(bio.get(), &data);
-    if (len > 0) {
-      return std::string(data, data + len);
-    } else {
-      return boost::none;
-    }
-  }
-}
-
 // return the first AC, if present
 static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
 {
@@ -144,7 +121,8 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
   if (!vomsdata_ptr) {
     vomsdata_ptr.reset(new vomsdata);
   }
-  auto ok = vomsdata_ptr->Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
+  auto ok =
+      vomsdata_ptr->Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
   if (!ok) {
     // vd.error is not interpreted correctly by the logger, which probably uses
     // errno
@@ -270,70 +248,5 @@ static ngx_int_t get_voms_user(ngx_http_request_t* r,
   v->valid = 1;
   v->not_found = 0;
   v->no_cacheable = 0;
-  return NGX_OK;
-}
-
-ngx_int_t get_voms(ngx_http_request_t* r,
-                   ngx_http_variable_value_t* v,
-                   uintptr_t data)
-{
-  // to show that get_voms gets called only once, even if the variable is used
-  // twice in the configuration file
-  static int count = 0;
-  assert(count == 0);
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "get_voms");
-
-  {
-    auto t0 = std::chrono::high_resolution_clock::now();
-
-    static ngx_str_t var = ngx_string("ssl_client_raw_cert");
-    u_char unused[sizeof("ssl_client_raw_cert")];
-
-    auto hash = ngx_hash_strlow(unused, var.data, var.len);
-
-    ngx_http_variable_value_t* raw_cert = ngx_http_get_variable(r, &var, hash);
-
-    // da rivedere gli errori ritornati (sempre che siano errori)
-
-    if (!raw_cert || raw_cert->not_found || !raw_cert->valid) {
-      ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "invalid raw_cert");
-      return NGX_OK;
-    }
-
-    BioPtr bio{BIO_new(BIO_s_mem()), BIO_free};
-    if (BIO_write(bio.get(), raw_cert->data, raw_cert->len) != raw_cert->len) {
-      ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "BIO_write() failed");
-      return NGX_OK;
-    }
-
-    X509Ptr x509{PEM_read_bio_X509(bio.get(), NULL, NULL, NULL), X509_free};
-    if (!x509) {
-      ngx_log_error(
-          NGX_LOG_DEBUG, r->connection->log, 0, "PEM_read_bio_X509() failed");
-      return NGX_OK;
-    }
-
-    auto t1 = std::chrono::high_resolution_clock::now();
-
-    ngx_log_error(NGX_LOG_DEBUG,
-                  r->connection->log,
-                  0,
-                  "time 1: %f us",
-                  std::chrono::duration<double, std::micro>(t1 - t0).count());
-
-    ngx_log_error(NGX_LOG_DEBUG,
-                  r->connection->log,
-                  0,
-                  "raw_cert: %s",
-                  to_string(raw_cert).c_str());
-  }
-
-  v->valid = 1;
-  v->no_cacheable = 1;
-  v->not_found = 0;
-
-  v->data = (u_char*)"VOMS";
-  v->len = 4;
-
   return NGX_OK;
 }
