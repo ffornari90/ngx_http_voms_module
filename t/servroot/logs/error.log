@@ -1,0 +1,11 @@
+2018/03/05 13:23:08 [notice] 8663#8663: using the "epoll" event method
+2018/03/05 13:23:08 [notice] 8663#8663: openresty/1.13.6.1
+2018/03/05 13:23:08 [notice] 8663#8663: built by gcc 7.2.1 20170829 (Red Hat 7.2.1-1) (GCC) 
+2018/03/05 13:23:08 [notice] 8663#8663: OS: Linux 4.13.0-26-generic
+2018/03/05 13:23:08 [notice] 8663#8663: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2018/03/05 13:23:08 [info] 8664#8664: *3 client SSL certificate verify error: (10:certificate has expired) while reading client request headers, client: 127.0.0.1, server: , request: "GET / HTTP/1.0", host: "localhost:8443"
+2018/03/05 13:23:08 [notice] 8664#8664: signal 3 (SIGQUIT) received from 8650, shutting down
+2018/03/05 13:23:08 [info] 8664#8664: epoll_wait() failed (4: Interrupted system call)
+2018/03/05 13:23:08 [notice] 8664#8664: signal 15 (SIGTERM) received from 8650, exiting
+2018/03/05 13:23:08 [notice] 8664#8664: exiting
+2018/03/05 13:23:08 [notice] 8664#8664: exit
