@@ -5,9 +5,10 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: https with x509 client authentication, expired client certificate
+=== TEST 1: https with x509 client authentication, valid proxy certificate no voms attributes 
 --- main_config
     env OPENSSL_ALLOW_PROXY_CERTS=1; 
+    env X509_VOMS_DIR=t/vomsdir;
 --- http_config
     server {
         error_log logs/error.log debug;
@@ -19,19 +20,19 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            echo $ssl_client_s_dn;
+            echo $voms_fqans $voms_user;
         }
     }
 --- config
     location = / {
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/2.cert.pem;
-        proxy_ssl_certificate_key ../../certs/2.key.pem;
+        proxy_ssl_certificate ../../certs/0.cert.pem;
+        proxy_ssl_certificate_key ../../certs/0.key.pem;
     }
 --- request
-GET /
+GET / 
 --- response_body_like eval
-qr/\n/ 
---- error_log 
-certificate has expired
---- error_code: 400
+qr/\n/
+--- error_log
+VOMS extension not found
+--- error_code: 200
