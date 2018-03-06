@@ -5,7 +5,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: https with x509 client authentication, valid proxy certificate expired voms attributes 
+=== TEST 1: https with x509 client authentication, valid proxy certificate with expired VOMS attributes 
 --- main_config
     env OPENSSL_ALLOW_PROXY_CERTS=1; 
     env X509_VOMS_DIR=t/vomsdir;
@@ -20,7 +20,8 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            echo $voms_fqans $voms_user;
+            echo $voms_fqans;
+            echo $voms_user;
         }
     }
 --- config
@@ -32,7 +33,7 @@ __DATA__
 --- request
 GET / 
 --- response_body_like eval
-qr/\n/
+qr/\n\n/
 --- error_log
 AC not valid anymore
 --- error_code: 200

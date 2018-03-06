@@ -29,3 +29,7 @@ A comma-separated list of _Fully Qualified Attribute Names_
 
 ### voms_user
 
+
+## Testing
+
+Setup and files to test the *ngx\_http\_voms\_module* are contained in the `t` folder. 
