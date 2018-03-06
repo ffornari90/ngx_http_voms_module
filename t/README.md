@@ -4,7 +4,7 @@
 
 Setup and files to test the *ngx\_http\_voms\_module* are contained in the **t** folder. The [Openresty data-driven testsuite](https://openresty.gitbooks.io/programming-openresty/content/testing/) has been adopted for testing.
 
-### Voms proxy certificates 
+### Test fixture setup 
 
 Proxy certificates are in the **certs** folder:
 
@@ -14,42 +14,14 @@ Proxy certificates are in the **certs** folder:
 
 Proxy certificates are generated using [VOMS client 3.3.0](http://italiangrid.github.io/voms/documentation/voms-clients-guide/3.0.3/). 
 
-The following options are evoked:
+The following options are used:
 
 	VOMS_CLIENTS_JAVA_OPTIONS="-Dvoms.fake.vo=test.vo -Dvoms.fake=true -Dvoms.fake.aaCert=<path_to_cert>/voms_example.cert.pem -Dvoms.fake.aaKey=<path_to_key>/voms_example.key.pem" voms-proxy-init3 -voms test.vo -cert <path_to_test0>/test0.p12 --valid <validity>
 
 *voms\_example.cert.pem* and *voms\_example.ket.pem* can be found in the **certs** folder. 
 
-To perform correctly the VOMS server connection, an *.lsc or *.pem file is needed in **/etc/grid-security/vomsdir**, see [VOMS client 3.3.0 User Guide](http://italiangrid.github.io/voms/documentation/voms-clients-guide/3.0.3/) for further details. An example of *voms.example.lsc* can be found in **vomsdir/test.vo**.
+To perform correctly the VOMS AC validation, a \*.lsc or \*.pem file is needed in **/etc/grid-security/vomsdir**, see [VOMS client 3.3.0 User Guide](http://italiangrid.github.io/voms/documentation/voms-clients-guide/3.0.3/) for further details. An example of *voms.example.lsc* can be found in **vomsdir/test.vo**.
 
-The *vomses* configuration is not actually needed for *voms-proxy-fake* evocations.
-
-### Test Description
-
-  * *empty\_voms\_proxy.t*: 
-    
-    **Input ->** 0.pem certificate and key. 
-    
-    **Expected output ->** 200-error-code, empty voms variables. 
-    
-    **Error log ->** "VOMS extension not found".
-   
-  * *expired\_ac\_proxy.t*: 
-
-    **Input ->** 1.pem certificate and key. 
-
-    **Expected output ->** 200-error-code, empty voms variables. 
-
-    **Error log ->** "AC not valid anymore".
-
-  * *expired\_proxy.t*: 
-   
-    **Input ->** 2.pem certificate and key. 
-   
-    **Expected output ->** 400-error-code, empty nginx variables.
-
-    ** Error log ->** "certificate has expired".
- 
 Trust-anchors (igi-test-ca.pem) are contained in the **trust-anchors** folder. Nginx server certificate and key (nginx\_voms\_example.cert.pem and nginx\_voms\_example\_key.pem) are in the **certs** folder.
 
 ### Running Tests
