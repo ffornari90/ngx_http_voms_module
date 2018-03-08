@@ -33,10 +33,8 @@ To run the tests made available in the `t` folder just type
 
 Using the docker image provided to exploit Openresty in the Storm2 project:
 
-	docker run --rm -it -v /path/to/ngx_http_voms_module:/home/build/ngx_http_voms_module storm2/ngx-voms-build
-	cd openresty-1.x.y
-	./configure ${resty_config_options} --add-module=../ngx_http_voms_module
-	make && make install
-	cd ..
-	sudo chown build.build -R t
-	prove -v 
+	cp -r t /tmp
+        cd /tmp
+	prove -v
+
+A copy of the `t` folder is needed since the `prove` command creates a directory `servroot` in `t`.  
