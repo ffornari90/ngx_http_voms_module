@@ -33,8 +33,8 @@ To run the tests made available in the `t` folder just type
 
 Using the docker image provided to exploit Openresty in the Storm2 project:
 
-	cp -r t /tmp
-        cd /tmp
-	prove -v
+    cp -r t /tmp
+    cd /tmp
+    prove -v
 
 A copy of the `t` folder is needed since the `prove` command creates a directory `servroot` in `t`.  
