@@ -8,8 +8,8 @@ __DATA__
 === TEST 1: https with x509 client authentication, valid proxy certificate with expired VOMS attributes 
 --- main_config
     env OPENSSL_ALLOW_PROXY_CERTS=1;
-    env X509_VOMS_DIR=/home/build/ngx_http_voms_module/t/vomsdir;
-    env X509_CERT_DIR=/home/build/ngx_http_voms_module/t/trust-anchors;
+    env X509_VOMS_DIR=t/vomsdir;
+    env X509_CERT_DIR=t/trust-anchors;
 --- http_config
     server {
         error_log logs/error.log debug;

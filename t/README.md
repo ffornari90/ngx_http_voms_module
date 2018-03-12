@@ -6,32 +6,21 @@ Setup and files to test the *ngx\_http\_voms\_module* are contained in the `t` f
 
 ### Test fixture setup 
 
-Proxy certificates are in the `certs` folder:
+Proxy certificates are in the `certs` folder (see [README.md](certs/README.md) for further details), while trust-anchors (e.g. igi-test-ca.pem) are contained in `trust-anchors`. 
 
- * 0.pem: long-lived proxy certificate, without Attribute Certificate (AC);
- * 1.pem: long-lived proxy certificate, with an expired AC;
- * 2.pem: expired proxy certificate.
+Nginx server certificate and key are nginx\_voms\_example.cert.pem and nginx\_voms\_example\_key.pem, respectively, and they are contained in `certs`.
 
-Proxy certificates are generated using [VOMS client 3.3.0](http://italiangrid.github.io/voms/documentation/voms-clients-guide/3.0.3/). 
-
-The following command is used:
-
-	VOMS_CLIENTS_JAVA_OPTIONS="-Dvoms.fake.vo=test.vo -Dvoms.fake=true -Dvoms.fake.aaCert=<path_to_cert>/voms_example.cert.pem -Dvoms.fake.aaKey=<path_to_key>/voms_example.key.pem" voms-proxy-init3 -voms test.vo -cert <path_to_test0>/test0.p12 --valid <validity>
-
-*voms\_example.cert.pem* and *voms\_example.ket.pem* can be found in the `certs` folder. 
-
-To perform correctly the VOMS AC validation, a \*.lsc or \*.pem file is needed in `/etc/grid-security/vomsdir`, see [VOMS client 3.3.0 User Guide](http://italiangrid.github.io/voms/documentation/voms-clients-guide/3.0.3/) for further details. An example of *voms.example.lsc* can be found in `vomsdir/test.vo`.
-
-Trust-anchors (igi-test-ca.pem) are contained in the `trust-anchors` folder. Nginx server certificate and key (nginx\_voms\_example.cert.pem and nginx\_voms\_example\_key.pem) are in the `certs` folder.
+To perform correctly the VOMS AC validation, a \*.lsc or \*.pem file is needed, see [VOMS client 3.3.0 User Guide](http://italiangrid.github.io/voms/documentation/voms-clients-guide/3.0.3/) for further details. The *voms.example.lsc* can be found in `vomsdir/test.vo`.
 
 ### Running Tests
 
-To run the tests made available in the `t` folder just type
+To run the tests made available in `t` just type
 
 	prove -v 
 
+from `t`' s parent directory.
 
-Using the docker image provided to exploit Openresty in the Storm2 project:
+Using the docker image provided to exploit Openresty in the Storm2 project (see [README.md](../README.md) for further details):
 
     cp -r t /tmp
     cd /tmp
