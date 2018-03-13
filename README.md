@@ -29,6 +29,43 @@ A comma-separated list of _Fully Qualified Attribute Names_
 
 ### voms_user
 
+user DN
+
+### voms_user_ca
+
+user CA
+
+### voms_server
+
+server DN
+
+### voms_server_ca
+
+server CA
+
+### voms_vo
+
+VO name
+
+### voms_server_uri
+
+VOMS server URI
+
+### voms_not_before
+
+not-before
+
+### voms_not_after
+
+not-after
+
+### voms_generic_attributes
+
+generic attributes
+
+### voms_serial
+
+serial number
 
 ## Testing
 
