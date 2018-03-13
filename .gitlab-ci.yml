@@ -8,7 +8,9 @@ build:
     - env | sort
     - id
     # ngx_http_voms_module build
-    - ${HOME}/build-install-ngx-voms.sh
+    - wget https://baltig.infn.it/storm2/storm2-docker/blob/2-script-build-execution/ngx-voms-build/assets/build-install-ngx-voms.sh
+    #- ${HOME}/build-install-ngx-voms.sh
+    - build-install-ngx-voms.sh
     #- cd ./openresty-1.x.y
     #- ./configure ${resty_config_options} --add-module=../ngx_http_voms_module
     #- make && make install
