@@ -15,6 +15,7 @@ build:
 
 test:
   stage: test
+  script:
     # ngx_http_voms_module test
     - cp -r t /tmp
     - cd /tmp
