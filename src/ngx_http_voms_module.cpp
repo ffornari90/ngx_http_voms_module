@@ -191,7 +191,7 @@ static ngx_int_t add_variables(ngx_conf_t* cf)
 // return the first AC, if present
 static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
 {
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   if (!r->http_connection->ssl) {
     return boost::none;
@@ -241,7 +241,7 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
 static void clean_voms_ac(void* data)
 {
   auto r = static_cast<ngx_http_request_t*>(data);
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   auto p = static_cast<MaybeVomsAc*>(
       ngx_http_get_module_ctx(r, ngx_http_voms_module));
@@ -269,7 +269,7 @@ static MaybeVomsAc* get_voms_ac_from_cache(ngx_http_request_t* r)
 
 static MaybeVomsAc const& get_voms_ac(ngx_http_request_t* r)
 {
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   MaybeVomsAc* acp = get_voms_ac_from_cache(r);
 
@@ -372,11 +372,29 @@ std::string get_voms_not_after(VomsAc const& ac)
 //   std::vector<attribute> attributes; /*!< The attributes themselves.    */
 // };
 
+static std::string encode(attribute const& a)
+{
+  return "n" + a.name + " v=" + a.value + " q=" + a.qualifier;
+}
+
 std::string get_voms_generic_attributes(VomsAc const& ac)
 {
+  std::string result;
+
   // the GetAttributes method is not declared const
   auto const attributes = const_cast<VomsAc&>(ac).GetAttributes();
-  return {};
+  if (!attributes.empty()) {
+    auto& gas = attributes.front().attributes;
+    bool first = true;
+    for (auto& a : gas) {
+      result += encode(a);
+      if (!first) {
+        result += ',';
+      }
+    }
+  }
+
+  return result;
 }
 
 std::string get_voms_serial(VomsAc const& ac)
