@@ -2,6 +2,9 @@
 # Official docker image.
 image: storm2/ngx-voms-build:latest
 
+before_script:
+  - source ${HOME}/.bashrc
+
 build:
   stage: build
   script:
