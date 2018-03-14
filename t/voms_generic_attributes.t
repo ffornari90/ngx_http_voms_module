@@ -22,18 +22,18 @@ __DATA__
 	location = / {
             default_type text/plain;
             echo $voms_fqans;
-            echo $voms_user;
+            echo $voms_user; 
         }
     }
 --- config
     location = / {
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/3.cert.pem;
-        proxy_ssl_certificate_key ../../certs/3.key.pem;
+        proxy_ssl_certificate ../../certs/4.cert.pem;
+        proxy_ssl_certificate_key ../../certs/4.key.pem;
     }
 --- request
 GET / 
 --- response_body
-/test
+/test/exp1,/test/exp2,/test/exp3/Role=PIPPO
 /C=IT/O=IGI/CN=test0
 --- error_code: 200
