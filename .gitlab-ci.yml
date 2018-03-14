@@ -7,8 +7,9 @@ build:
   script:
     - env | sort
     - id
+    - ls -al
     # ngx_http_voms_module build
-    - sh ${HOME}/build-install-ngx-voms.sh
+    - /bin/sh ${HOME}/build-install-ngx-voms.sh
     #- cd ./openresty-1.x.y
     #- ./configure ${resty_config_options} --add-module=../ngx_http_voms_module
     #- make && make install
