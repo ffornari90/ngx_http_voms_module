@@ -5,7 +5,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: https with x509 client authentication, verification of valid VOMS attributes extracted by ngx_http_voms_module 
+=== TEST 1: valid AC, including generic attributes
 --- main_config
     env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
@@ -46,11 +46,12 @@ GET /
 /C=IT/O=IGI/CN=test0
 /C=IT/O=IGI/CN=Test CA
 /test/exp1,/test/exp2,/test/exp3/Role=PIPPO
-/C=IT/O=IGI/CN=nginx-voms.example
+/C=IT/O=IGI/CN=voms.example
 /C=IT/O=IGI/CN=Test CA
 test.vo
-2018-01-01T00:00:00
-2030-01-01T00:00:00
-nickname = newland (test.vo),nickname = giaco (test.vo)
-1644758975
+voms.example:15000
+20180101000000Z
+20300101000000Z
+n=nickname v=newland q=test.vo,n=nickname v=giaco q=test.vo
+0
 --- error_code: 200

@@ -374,7 +374,7 @@ std::string get_voms_not_after(VomsAc const& ac)
 
 static std::string encode(attribute const& a)
 {
-  return "n" + a.name + " v=" + a.value + " q=" + a.qualifier;
+  return "n=" + a.name + " v=" + a.value + " q=" + a.qualifier;
 }
 
 std::string get_voms_generic_attributes(VomsAc const& ac)
@@ -387,10 +387,12 @@ std::string get_voms_generic_attributes(VomsAc const& ac)
     auto& gas = attributes.front().attributes;
     bool first = true;
     for (auto& a : gas) {
-      result += encode(a);
-      if (!first) {
+      if (first) {
+        first = false;
+      } else {
         result += ',';
       }
+      result += encode(a);
     }
   }
 
