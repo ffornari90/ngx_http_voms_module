@@ -21,8 +21,17 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            echo $voms_fqans;
             echo $voms_user; 
+            echo $voms_user_ca;
+            echo $voms_fqans;
+            echo $voms_server; 
+            echo $voms_server_ca;
+            echo $voms_vo; 
+            echo $voms_server_uri;
+            echo $voms_not_before;
+            echo $voms_not_after;
+            echo $voms_generic_attributes;
+            echo $voms_serial;
         }
     }
 --- config
@@ -34,6 +43,14 @@ __DATA__
 --- request
 GET / 
 --- response_body
-/test/exp1,/test/exp2,/test/exp3/Role=PIPPO
 /C=IT/O=IGI/CN=test0
+/C=IT/O=IGI/CN=Test CA
+/test/exp1,/test/exp2,/test/exp3/Role=PIPPO
+/C=IT/O=IGI/CN=nginx-voms.example
+/C=IT/O=IGI/CN=Test CA
+test.vo
+2018-01-01T00:00:00
+2030-01-01T00:00:00
+nickname = newland (test.vo),nickname = giaco (test.vo)
+1644758975
 --- error_code: 200
