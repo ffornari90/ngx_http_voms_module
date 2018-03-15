@@ -5,7 +5,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: https with x509 client authentication, verification of valid VOMS attributes extracted by ngx_http_voms_module 
+=== TEST 1: https with x509 client authentication, untrusted AC signature 
 --- main_config
     env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
@@ -21,19 +21,16 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            echo $voms_fqans;
-            echo $voms_user;
         }
     }
 --- config
     location = / {
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/3.cert.pem;
-        proxy_ssl_certificate_key ../../certs/3.key.pem;
+        proxy_ssl_certificate ../../certs/5.cert.pem;
+        proxy_ssl_certificate_key ../../certs/5.key.pem;
     }
 --- request
 GET / 
---- response_body
-/test
-/C=IT/O=IGI/CN=test0
+--- error_log
+Cannot verify AC signature
 --- error_code: 200

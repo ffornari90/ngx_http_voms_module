@@ -6,6 +6,9 @@ Proxy certificates are generated using [VOMS client 3.3.0](http://italiangrid.gi
  * 0.pem: long-lived proxy certificate, without Attribute Certificate (AC);
  * 1.pem: long-lived proxy certificate, with an expired AC;
  * 2.pem: expired proxy certificate.
+ * 3.pem: long-lived proxy with valid VOMS attributes
+ * 4.pem: long-lived proxy with VOMS generic attributes containing reserved characters
+ * 5.pem: long-lived proxy with VOMS AC signed by an untrusted CA
 
 To obtain such certificates the following command is used:
 

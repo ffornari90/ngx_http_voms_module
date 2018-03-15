@@ -5,7 +5,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: valid AC, including generic attributes
+=== TEST 1: valid AC, verification of valid VOMS attributes extracted by ngx_http_voms_module
 --- main_config
     env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
@@ -37,8 +37,8 @@ __DATA__
 --- config
     location = / {
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/4.cert.pem;
-        proxy_ssl_certificate_key ../../certs/4.key.pem;
+        proxy_ssl_certificate ../../certs/3.cert.pem;
+        proxy_ssl_certificate_key ../../certs/3.key.pem;
     }
 --- request
 GET / 
@@ -53,5 +53,6 @@ voms.example:15000
 20180101000000Z
 20300101000000Z
 n=nickname v=newland q=test.vo,n=nickname v=giaco q=test.vo
-0
+123
 --- error_code: 200
+
