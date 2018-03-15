@@ -372,9 +372,33 @@ std::string get_voms_not_after(VomsAc const& ac)
 //   std::vector<attribute> attributes; /*!< The attributes themselves.    */
 // };
 
+std::string escape_uri(std::string const& src)
+{
+  // the following just counts the number of characters that need escaping
+  auto const n_escape = ngx_escape_uri(
+      nullptr,  // <--
+      reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
+      src.size(),
+      NGX_ESCAPE_URI_COMPONENT);
+
+  if (n_escape == 0) {
+    return src;
+  } else {
+    std::string result;
+    result.resize(src.size() + 2 * n_escape);
+    auto last = reinterpret_cast<char*>(ngx_escape_uri(
+        reinterpret_cast<u_char*>(const_cast<char*>(result.data())),
+        reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
+        src.size(),
+        NGX_ESCAPE_URI_COMPONENT));
+    assert(last == &result.back());
+    return result;
+  }
+}
+
 static std::string encode(attribute const& a)
 {
-  return "n=" + a.name + " v=" + a.value + " q=" + a.qualifier;
+  return "n=" + a.name + " v=" + escape_uri(a.value) + " q=" + a.qualifier;
 }
 
 std::string get_voms_generic_attributes(VomsAc const& ac)
