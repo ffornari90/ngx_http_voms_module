@@ -392,7 +392,7 @@ std::string escape_uri(std::string const& src)
       reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
       src.size(),
       NGX_ESCAPE_URI_COMPONENT));
-  assert(last == &result.back());
+  assert(last == result.data() + result.size());
   return result;
 }
 
