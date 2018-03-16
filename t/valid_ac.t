@@ -53,6 +53,6 @@ voms.example:15000
 20180101000000Z
 20300101000000Z
 n=nickname v=newland q=test.vo,n=nickname v=giaco q=test.vo
-123
+7B
 --- error_code: 200
 
