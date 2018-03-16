@@ -21,6 +21,7 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
+            echo $voms_user;
         }
     }
 --- config
