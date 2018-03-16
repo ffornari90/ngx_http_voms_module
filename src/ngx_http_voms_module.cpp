@@ -194,6 +194,10 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
   ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   if (!r->http_connection->ssl) {
+    ngx_log_error(NGX_LOG_ERR,
+                  r->connection->log,
+                  0,
+                  "SSL not enabled");
     return boost::none;
   }
 
@@ -203,7 +207,7 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
     ngx_log_error(NGX_LOG_ERR,
                   r->connection->log,
                   0,
-                  "SSL_get_peer_certificate() failed");
+                  "no SSL peer certificate available");
     return boost::none;
   }
 
@@ -356,17 +360,6 @@ std::string get_voms_not_after(VomsAc const& ac)
   return ac.date2;
 }
 
-// struct attribute {
-//   std::string name;      /*!< attribute's group */
-//   std::string qualifier; /*!< attribute's qualifier */
-//   std::string value;     /*!< attribute's value */
-// };
-
-// struct attributelist {
-//   std::string grantor;               /*!< Who granted these attributes. */
-//   std::vector<attribute> attributes; /*!< The attributes themselves.    */
-// };
-
 static std::string escape_uri(std::string const& src)
 {
   std::string result = src;
@@ -380,12 +373,10 @@ static std::string escape_uri(std::string const& src)
 
   if (n_escape > 0) {
     result.resize(src.size() + 2 * n_escape);
-    auto last = reinterpret_cast<char*>(ngx_escape_uri(
-        reinterpret_cast<u_char*>(const_cast<char*>(result.data())),
-        reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
-        src.size(),
-        NGX_ESCAPE_URI_COMPONENT));
-    assert(last == result.data() + result.size());
+    ngx_escape_uri(reinterpret_cast<u_char*>(const_cast<char*>(result.data())),
+                   reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
+                   src.size(),
+                   NGX_ESCAPE_URI_COMPONENT);
   }
 
   return result;
