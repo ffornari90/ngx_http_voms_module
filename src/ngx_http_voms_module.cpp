@@ -372,8 +372,10 @@ std::string get_voms_not_after(VomsAc const& ac)
 //   std::vector<attribute> attributes; /*!< The attributes themselves.    */
 // };
 
-std::string escape_uri(std::string const& src)
+static std::string escape_uri(std::string const& src)
 {
+  std::string result = src;
+
   // the following just counts the number of characters that need escaping
   auto const n_escape =
       ngx_escape_uri(nullptr,  // <--
@@ -381,18 +383,16 @@ std::string escape_uri(std::string const& src)
                      src.size(),
                      NGX_ESCAPE_URI_COMPONENT);
 
-  if (n_escape == 0) {
-    return src;
+  if (n_escape > 0) {
+    result.resize(src.size() + 2 * n_escape);
+    auto last = reinterpret_cast<char*>(ngx_escape_uri(
+        reinterpret_cast<u_char*>(const_cast<char*>(result.data())),
+        reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
+        src.size(),
+        NGX_ESCAPE_URI_COMPONENT));
+    assert(last == result.data() + result.size());
   }
 
-  std::string result;
-  result.resize(src.size() + 2 * n_escape);
-  auto last = reinterpret_cast<char*>(ngx_escape_uri(
-      reinterpret_cast<u_char*>(const_cast<char*>(result.data())),
-      reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
-      src.size(),
-      NGX_ESCAPE_URI_COMPONENT));
-  assert(last == result.data() + result.size());
   return result;
 }
 
