@@ -2,7 +2,7 @@
 
 ## Description
 
-_ngx_http_voms_module_ is a module for the [Nginx web server](https://www.nginx.org/) that enables client-side authentication based on X.509 proxies augmented with Attribute Certificates, typically obtained through a [Virtual Organization Membership Service](https://italiangrid.github.io/voms/) (VOMS).
+_ngx_http_voms_module_ is a module for the [Nginx web server](https://www.nginx.org/) that enables client-side authentication based on X.509 proxy certificates augmented with VOMS Attribute Certificates, typically obtained from a [Virtual Organization Membership Service](https://italiangrid.github.io/voms/) (VOMS) server.
 
 The module defines a set of [_embedded_ variables](~embedded-variables), whose values are extracted from the first Attribute Certificate found in the certificate chain.
 
