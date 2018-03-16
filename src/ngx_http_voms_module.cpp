@@ -220,13 +220,8 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
   auto ok =
       vomsdata_ptr->Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
   if (!ok) {
-    // vd.error is not interpreted correctly by the logger, which probably uses
-    // errno
-    ngx_log_error(NGX_LOG_ERR,
-                  r->connection->log,
-                  vomsdata_ptr->error,
-                  "%s",
-                  vomsdata_ptr->ErrorMessage().c_str());
+    auto msg = vomsdata_ptr->ErrorMessage().c_str();
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "%s", msg);
     return boost::none;
   }
 
