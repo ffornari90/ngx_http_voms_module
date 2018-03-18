@@ -23,6 +23,8 @@ build:
 
 test:
   stage: test
+  dependencies:
+    - build
   script:
     - id
     - source ${HOME}/openresty-env
