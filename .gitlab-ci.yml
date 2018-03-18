@@ -31,6 +31,7 @@ test:
     - env | sort
     - ls -al . 
     - ls -al local
+    - cp -r local ${HOME}/local
     # ngx_http_voms_module test
     #- sh ${HOME}/build-install-ngx-voms.sh
     - cp -r t /tmp
