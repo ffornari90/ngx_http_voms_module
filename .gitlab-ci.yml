@@ -18,15 +18,15 @@ build:
     - sh ${HOME}/build-install-ngx-voms.sh
   artifacts:
     paths:
-      - local
+      - ${HOME}/local
 
 test:
   stage: test
   script:
-    - env | sort
     - id
     - source ${HOME}/openresty-env
-    - ls -al ${HOME}
+    - env | sort
+    - ls -al ${HOME}/local
     # ngx_http_voms_module test
     #- sh ${HOME}/build-install-ngx-voms.sh
     - cp -r t /tmp
