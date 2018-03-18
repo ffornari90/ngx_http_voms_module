@@ -16,22 +16,22 @@ build:
     - id
     # ngx_http_voms_module build
     - sh ${HOME}/build-install-ngx-voms.sh
-    - cp -r ${HOME}/local local
+    - cp -r ${HOME}/local localtemp
   artifacts:
     paths:
-      - local
+      - localtemp
 
 test:
   stage: test
   dependencies:
     - build
   script:
-    - id
+    - ls -al localtemp
+    - cp -r localtemp ${HOME}/local
+    - chmod +x ${HOME}/local/openresty/bin/openresty
     - source ${HOME}/openresty-env
     - env | sort
-    - ls -al . 
-    - ls -al local
-    - cp -r local ${HOME}/local
+    - id
     # ngx_http_voms_module test
     #- sh ${HOME}/build-install-ngx-voms.sh
     - cp -r t /tmp
