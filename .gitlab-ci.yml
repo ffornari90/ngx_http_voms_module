@@ -6,15 +6,9 @@ stages:
   - build
   - test
 
-#before_script:
-#  - source ${HOME}/openresty-env
-  
 build:
   stage: build
   script:
-    - env | sort
-    - id
-    # ngx_http_voms_module build
     - sh ${HOME}/build-install-ngx-voms.sh
     - cp -r ${HOME}/local localtemp
   artifacts:
@@ -26,13 +20,12 @@ test:
   dependencies:
     - build
   script:
-    - ls -al localtemp
     - cp -r localtemp ${HOME}/local
     - chmod +x ${HOME}/local/openresty/bin/openresty
+    - chmod +x ${HOME}/local/openresty/nginx/sbin/nginx
     - source ${HOME}/openresty-env
+    - which openresty
     - env | sort
-    - id
-    # ngx_http_voms_module test
     #- sh ${HOME}/build-install-ngx-voms.sh
     - cp -r t /tmp
     - cd /tmp
