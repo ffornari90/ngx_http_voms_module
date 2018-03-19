@@ -21,7 +21,7 @@ test:
   dependencies:
     - build
   script:
-    - cp -r localtemp ${HOME}/local
+    - cp -r localtemp/openresty/ ${HOME}/local/
     - chmod +x ${HOME}/local/openresty/bin/openresty
     - chmod +x ${HOME}/local/openresty/nginx/sbin/nginx
     - source ${HOME}/openresty-env
