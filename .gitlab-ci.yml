@@ -2,24 +2,32 @@
 # Official docker image.
 image: storm2/ngx-voms-build:latest
 
-before_script:
-  - source ${HOME}/openresty-env
-  
+stages:
+  - build
+  - test
+
 build:
   stage: build
   script:
-    - env | sort
-    - id
-    # ngx_http_voms_module build
     - sh ${HOME}/build-install-ngx-voms.sh
+    - cat ${HOME}/local/openresty/resty.index
+    - cp -r ${HOME}/local localtemp
+  artifacts:
+    paths:
+      - localtemp
 
 test:
   stage: test
+  dependencies:
+    - build
   script:
+    - cp -r localtemp/openresty/ ${HOME}/local/
+    - chmod +x ${HOME}/local/openresty/bin/openresty
+    - chmod +x ${HOME}/local/openresty/nginx/sbin/nginx
+    - source ${HOME}/openresty-env
+    - which openresty
     - env | sort
-    - id
-    # ngx_http_voms_module test
-    - sh ${HOME}/build-install-ngx-voms.sh
+    #- sh ${HOME}/build-install-ngx-voms.sh
     - cp -r t /tmp
     - cd /tmp
     - prove -v
