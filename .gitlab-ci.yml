@@ -10,7 +10,6 @@ build:
   stage: build
   script:
     - sh ${HOME}/build-install-ngx-voms.sh
-    - cat ${HOME}/local/openresty/resty.index
     - cp -r ${HOME}/local localtemp
   artifacts:
     paths:
@@ -22,12 +21,4 @@ test:
     - build
   script:
     - cp -r localtemp/openresty/ ${HOME}/local/
-    - chmod +x ${HOME}/local/openresty/bin/openresty
-    - chmod +x ${HOME}/local/openresty/nginx/sbin/nginx
-    - source ${HOME}/openresty-env
-    - which openresty
-    - env | sort
-    #- sh ${HOME}/build-install-ngx-voms.sh
-    - cp -r t /tmp
-    - cd /tmp
-    - prove -v
+    - sh test-ngx-voms.sh
