@@ -9,11 +9,12 @@ stages:
 build:
   stage: build
   script:
+    - env
     - sh ${HOME}/build-install-ngx-voms.sh
-    #- cp -r ${HOME}/local localtemp
+    - cp -r ${HOME}/local local
   artifacts:
     paths:
-      - ${HOME}/local
+      - local
 
 test:
   stage: test
