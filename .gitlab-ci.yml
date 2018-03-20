@@ -21,5 +21,5 @@ test:
   dependencies:
     - build
   script:
-    - mv local ${HOME}/local/
+    - mv local/* ${HOME}/local/
     - sh test-ngx-voms.sh
