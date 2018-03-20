@@ -63,29 +63,110 @@ ngx_module_t ngx_http_voms_module = {
 
 static std::unique_ptr<vomsdata> vomsdata_ptr;
 
-static ngx_int_t get_voms_fqans(  //
-    ngx_http_request_t* r,
-    ngx_http_variable_value_t* v,
-    uintptr_t data);
-static ngx_int_t get_voms_user(  //
+static ngx_int_t generic_getter(  //
     ngx_http_request_t* r,
     ngx_http_variable_value_t* v,
     uintptr_t data);
 
+using getter_t = std::string(VomsAc const& voms);
+static getter_t get_voms_user;
+static getter_t get_voms_user_ca;
+static getter_t get_voms_fqans;
+static getter_t get_voms_server;
+static getter_t get_voms_server_ca;
+static getter_t get_voms_vo;
+static getter_t get_voms_server_uri;
+static getter_t get_voms_not_before;
+static getter_t get_voms_not_after;
+static getter_t get_voms_generic_attributes;
+static getter_t get_voms_serial;
+
 static ngx_http_variable_t variables[] = {
     {
-        ngx_string("voms_fqans"),
+        ngx_string("voms_user"),
         NULL,
-        get_voms_fqans,
-        0,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_user),
         NGX_HTTP_VAR_NOCACHEABLE,
         0  //
     },
     {
-        ngx_string("voms_user"),
+        ngx_string("voms_user_ca"),
         NULL,
-        get_voms_user,
-        0,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_user_ca),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_fqans"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_fqans),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_server"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_server),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_server_ca"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_server_ca),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_vo"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_vo),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_server_uri"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_server_uri),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_not_before"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_not_before),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_not_after"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_not_after),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_generic_attributes"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_generic_attributes),
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
+    {
+        ngx_string("voms_serial"),
+        NULL,
+        generic_getter,
+        reinterpret_cast<uintptr_t>(&get_voms_serial),
         NGX_HTTP_VAR_NOCACHEABLE,
         0  //
     },
@@ -110,9 +191,13 @@ static ngx_int_t add_variables(ngx_conf_t* cf)
 // return the first AC, if present
 static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
 {
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   if (!r->http_connection->ssl) {
+    ngx_log_error(NGX_LOG_ERR,
+                  r->connection->log,
+                  0,
+                  "SSL not enabled");
     return boost::none;
   }
 
@@ -122,7 +207,7 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
     ngx_log_error(NGX_LOG_ERR,
                   r->connection->log,
                   0,
-                  "SSL_get_peer_certificate() failed");
+                  "no SSL peer certificate available");
     return boost::none;
   }
 
@@ -139,13 +224,8 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
   auto ok =
       vomsdata_ptr->Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
   if (!ok) {
-    // vd.error is not interpreted correctly by the logger, which probably uses
-    // errno
-    ngx_log_error(NGX_LOG_ERR,
-                  r->connection->log,
-                  vomsdata_ptr->error,
-                  "%s",
-                  vomsdata_ptr->ErrorMessage().c_str());
+    auto msg = vomsdata_ptr->ErrorMessage().c_str();
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "%s", msg);
     return boost::none;
   }
 
@@ -160,7 +240,7 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
 static void clean_voms_ac(void* data)
 {
   auto r = static_cast<ngx_http_request_t*>(data);
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   auto p = static_cast<MaybeVomsAc*>(
       ngx_http_get_module_ctx(r, ngx_http_voms_module));
@@ -188,7 +268,7 @@ static MaybeVomsAc* get_voms_ac_from_cache(ngx_http_request_t* r)
 
 static MaybeVomsAc const& get_voms_ac(ngx_http_request_t* r)
 {
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   MaybeVomsAc* acp = get_voms_ac_from_cache(r);
 
@@ -200,11 +280,11 @@ static MaybeVomsAc const& get_voms_ac(ngx_http_request_t* r)
   return *acp;
 }
 
-static ngx_int_t get_voms_fqans(ngx_http_request_t* r,
+static ngx_int_t generic_getter(ngx_http_request_t* r,
                                 ngx_http_variable_value_t* v,
-                                uintptr_t)
+                                uintptr_t data)
 {
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
   v->not_found = 1;
   v->valid = 0;
@@ -216,52 +296,120 @@ static ngx_int_t get_voms_fqans(ngx_http_request_t* r,
     return NGX_OK;
   }
 
-  auto fqans = boost::algorithm::join(ac->fqan, ",");
+  using getter_p = std::string (*)(VomsAc const& voms);
+  auto getter = reinterpret_cast<getter_p>(data);
+  std::string const value = getter(*ac);
 
-  auto data = static_cast<u_char*>(ngx_pnalloc(r->pool, fqans.size()));
-  if (!data) {
+  auto buffer = static_cast<u_char*>(ngx_pnalloc(r->pool, value.size()));
+  if (!buffer) {
     ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_pnalloc() failed");
     return NGX_OK;
   }
-  ngx_memcpy(data, fqans.c_str(), fqans.size());
+  ngx_memcpy(buffer, value.c_str(), value.size());
 
-  v->data = data;
-  v->len = fqans.size();
+  v->data = buffer;
+  v->len = value.size();
   v->valid = 1;
   v->not_found = 0;
   v->no_cacheable = 0;
   return NGX_OK;
 }
 
-static ngx_int_t get_voms_user(ngx_http_request_t* r,
-                               ngx_http_variable_value_t* v,
-                               uintptr_t)
+std::string get_voms_user(VomsAc const& ac)
 {
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __FUNCTION__);
+  return ac.user;
+}
 
-  v->not_found = 1;
-  v->valid = 0;
+std::string get_voms_user_ca(VomsAc const& ac)
+{
+  return ac.userca;
+}
 
-  auto& ac = get_voms_ac(r);
+std::string get_voms_fqans(VomsAc const& ac)
+{
+  return boost::algorithm::join(ac.fqan, ",");
+}
 
-  if (!ac) {
-    ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "get_voms_ac() failed");
-    return NGX_OK;
+std::string get_voms_server(VomsAc const& ac)
+{
+  return ac.server;
+}
+
+std::string get_voms_server_ca(VomsAc const& ac)
+{
+  return ac.serverca;
+}
+
+std::string get_voms_vo(VomsAc const& ac)
+{
+  return ac.voname;
+}
+
+std::string get_voms_server_uri(VomsAc const& ac)
+{
+  return ac.uri;
+}
+
+std::string get_voms_not_before(VomsAc const& ac)
+{
+  return ac.date1;
+}
+
+std::string get_voms_not_after(VomsAc const& ac)
+{
+  return ac.date2;
+}
+
+static std::string escape_uri(std::string const& src)
+{
+  std::string result = src;
+
+  // the following just counts the number of characters that need escaping
+  auto const n_escape =
+      ngx_escape_uri(nullptr,  // <--
+                     reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
+                     src.size(),
+                     NGX_ESCAPE_URI_COMPONENT);
+
+  if (n_escape > 0) {
+    result.resize(src.size() + 2 * n_escape);
+    ngx_escape_uri(reinterpret_cast<u_char*>(const_cast<char*>(result.data())),
+                   reinterpret_cast<u_char*>(const_cast<char*>(src.data())),
+                   src.size(),
+                   NGX_ESCAPE_URI_COMPONENT);
   }
 
-  auto const& user = ac->user;
+  return result;
+}
 
-  auto data = static_cast<u_char*>(ngx_pnalloc(r->pool, user.size()));
-  if (!data) {
-    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_pnalloc() failed");
-    return NGX_OK;
+static std::string encode(attribute const& a)
+{
+  return "n=" + a.name + " v=" + escape_uri(a.value) + " q=" + a.qualifier;
+}
+
+std::string get_voms_generic_attributes(VomsAc const& ac)
+{
+  std::string result;
+
+  // the GetAttributes method is not declared const
+  auto const attributes = const_cast<VomsAc&>(ac).GetAttributes();
+  if (!attributes.empty()) {
+    auto& gas = attributes.front().attributes;
+    bool first = true;
+    for (auto& a : gas) {
+      if (first) {
+        first = false;
+      } else {
+        result += ',';
+      }
+      result += encode(a);
+    }
   }
-  ngx_memcpy(data, user.c_str(), user.size());
 
-  v->data = data;
-  v->len = user.size();
-  v->valid = 1;
-  v->not_found = 0;
-  v->no_cacheable = 0;
-  return NGX_OK;
+  return result;
+}
+
+std::string get_voms_serial(VomsAc const& ac)
+{
+  return ac.serial;
 }
