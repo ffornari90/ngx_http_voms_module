@@ -11,7 +11,7 @@ build:
   script:
     - env
     - sh ${HOME}/build-install-ngx-voms.sh
-    - cp -r ${HOME}/local local
+    - mv ${HOME}/local local
   artifacts:
     paths:
       - local
@@ -21,5 +21,5 @@ test:
   dependencies:
     - build
   script:
-    - cp -r local/openresty/ ${HOME}/local/
+    - mv local ${HOME}/local/
     - sh test-ngx-voms.sh
