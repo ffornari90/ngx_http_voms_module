@@ -18,7 +18,7 @@ A Docker image is available for use in the context of the StoRM2 project, where 
 
     $ docker run --rm -it -v /path/to/ngx_http_voms_module:/home/build/ngx_http_voms_module storm2/ngx-voms-build
     % cd openresty-1.x.y
-    % ./configure ${resty_config_options} --add-module=../ngx_http_voms_module
+    % ./configure ${RESTY_CONFIG_OPTIONS} --add-module=../ngx_http_voms_module
     % make && make install
 
 ## Embedded Variables
