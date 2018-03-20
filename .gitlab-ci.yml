@@ -21,5 +21,7 @@ test:
   dependencies:
     - build
   script:
-    - mv -f local/* ${HOME}/local/
+    - rsync -a local/ ${HOME}/local/
+    - rm -rf local/*
+    #- mv -f local/* ${HOME}/local/
     - sh test-ngx-voms.sh
