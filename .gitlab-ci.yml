@@ -10,15 +10,15 @@ build:
   stage: build
   script:
     - sh ${HOME}/build-install-ngx-voms.sh
-    - cp -r ${HOME}/local localtemp
+    #- cp -r ${HOME}/local localtemp
   artifacts:
     paths:
-      - localtemp
+      - ${HOME}/local
 
 test:
   stage: test
   dependencies:
     - build
   script:
-    - cp -r localtemp/openresty/ ${HOME}/local/
+    - cp -r local/openresty/ ${HOME}/local/
     - sh test-ngx-voms.sh
