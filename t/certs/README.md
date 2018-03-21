@@ -9,6 +9,8 @@ Proxy certificates are generated using [VOMS client 3.3.1](http://italiangrid.gi
  * 3.pem: long-lived proxy with valid VOMS attributes;
  * 4.pem: long-lived proxy with VOMS generic attributes containing reserved characters;
  * 5.pem: long-lived proxy with valid VOMS attributes, `*.lsc` file missing in `vomsdir`. 
+ * 6.pem: long-lived proxy with valid VOMS attributes, with an old format for fqans. 
+
 
 To obtain such certificates the following command is used:
 
@@ -19,7 +21,7 @@ Once VOMS proxy certificates are generated in a `*.pem` format, they need to be 
 	awk '/BEGIN RSA PRIVATE KEY/,/END RSA PRIVATE KEY/' <name>.pem > <name>.key.pem
 	awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/' <name>.pem > <name>.cert.pem
 
-where `<name>` could be for instance `0,1,2,3,4` or `5`.
+where `<name>` could be for instance `0,1,2,etc..`
 
 *voms\_example.cert.pem* and *voms\_example.ket.pem* can be found in `certs`.
 
