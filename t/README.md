@@ -33,7 +33,7 @@ A copy of the `t` folder is needed since the `prove` command creates a directory
 To enable test coverage pass the `--coverage` option to both the compiler and the linker. For example, if the build happens inside the ``storm2/nginx-voms-build`` image:
 
 ```
-    % ./configure ${resty_config_options} --add-module=../ngx_http_voms_module --with-debug --with-cc-opt="-g -O0 --coverage" --with-ld-opt="--coverage"
+    % ./configure ${RESTY_CONFIG_OPTIONS} --add-module=../ngx_http_voms_module --with-debug --with-cc-opt="-g -O0 --coverage" --with-ld-opt="--coverage"
     % make && make install
 ```
 
@@ -41,5 +41,5 @@ Building in debug mode, with no optimizations, helps to better associate coverag
 
 The above command generates data files aside the source files for all Nginx. To enable coverage only for ``ngx_http_voms_module`` the ``--coverage`` option should be passed only when compiling ``ngx_http_voms_module.cpp`` (to be done).
 
-The run the tests, e.g. with `prove`. This will create other data files with coverage information. To view that information, run `gcov <source of object file>`, e.g. `gcov /home/build/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ngx_http_voms_module.o`. This will produce files with the ``.gcov`` extension in the current directory.
+Then run the tests, e.g. with `prove`. This will create other data files with coverage information. To view that information, run `gcov <source of object file>`, e.g. `gcov /home/build/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ngx_http_voms_module.o`. This will produce files with the ``.gcov`` extension in the current directory.
 
