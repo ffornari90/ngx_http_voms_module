@@ -24,6 +24,7 @@ __DATA__
     }
 --- config
     location = / {
+        error_log logs/error-proxy.log debug;
         proxy_pass https://localhost:8443/;
     }
 --- request
