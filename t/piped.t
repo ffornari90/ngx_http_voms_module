@@ -5,7 +5,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: valid AC, verification of valid VOMS attributes extracted by ngx_http_voms_module
+=== TEST 1: valid AC, subsequent requests for $voms_user attribute 
 --- main_config
     env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
