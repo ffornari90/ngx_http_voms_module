@@ -41,5 +41,5 @@ if [ ! -d "${module_root}" ]; then
     exit 1
 fi
 
-mkdir /tmp/t
+mkdir -p /tmp/t
 prove ${module_root}/t
