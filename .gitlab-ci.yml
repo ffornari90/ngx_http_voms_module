@@ -17,16 +17,6 @@ build:
     paths:
       - local
 
-buildc:
-  stage: build
-  script:
-    - env
-    - sh ${HOME}/build-install-ngx-voms.sh -d -c
-    - mv ${HOME}/local localc
-  artifacts:
-    paths:
-      - localc
-
 test:
   stage: test
   dependencies:
@@ -36,14 +26,11 @@ test:
     - mv local ${HOME}
     - sh test-ngx-voms.sh
 
-testc:
+coverage:
   stage: test
-  dependencies:
-    - buildc
   script:
-    - rm -rf ${HOME}/local/
-    - mv localc local
-    - mv local ${HOME}
+    - env
+    - sh ${HOME}/build-install-ngx-voms.sh -d -c
     - sh test-ngx-voms.sh
     - sh cov-ngx-voms.sh
     - mv cov coverage
