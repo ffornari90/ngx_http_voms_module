@@ -30,11 +30,9 @@
 # The script works best (i.e. it is tested) if run within a docker container
 # started from the storm2/ngx-voms-build image.
 
-echo $PATH
-
 mkdir -p cov
 cd cov
 
 geninfo --base-directory ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ --output-filename coverage.info ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/
 
-genhtml --demangle-cpp coverage.info
+genhtml --demangle-cpp coverage.info &> output
