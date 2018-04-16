@@ -41,7 +41,7 @@ coverage:
 pages:
   stage: deploy
   dependencies:
-    - testc
+    - coverage
   script:
     - mv coverage/ public/
   artifacts:
