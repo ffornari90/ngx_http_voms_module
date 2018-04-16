@@ -46,6 +46,6 @@ testc:
     - sh test-ngx-voms.sh
     - sh cov-ngx-voms.sh
     - mv cov publish
-  artifact:
+  artifacts:
     paths:
       - publish
