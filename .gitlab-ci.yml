@@ -5,6 +5,7 @@ image: joda70/ngx-voms-build:latest
 stages:
   - build
   - test
+  - deploy
 
 build:
   stage: build
@@ -45,7 +46,18 @@ testc:
     - mv local ${HOME}
     - sh test-ngx-voms.sh
     - sh cov-ngx-voms.sh
-    - mv cov publish
+    - mv cov coverage
   artifacts:
     paths:
-      - publish
+      - coverage
+
+pages:
+  stage: deploy
+  dependencies:
+    - testc
+  script:
+    - mv coverage/ public/
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
