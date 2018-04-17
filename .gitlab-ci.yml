@@ -25,6 +25,7 @@ test4c:
     - build4c
   script:
     - rm -rf ${HOME}/local/
+    - rm -rf ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/
     - mv local ${HOME}
     - mv nginx-1.13.6 ${HOME}/openresty-1.13.6.1/build/
     - sh test-ngx-voms.sh
