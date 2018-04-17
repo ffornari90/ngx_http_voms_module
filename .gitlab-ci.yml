@@ -17,7 +17,7 @@ build4c:
   artifacts:
     paths:
       - local
-      - nginx
+      - nginx-1.13.6
 
 test4c:
   stage: test
