@@ -13,7 +13,7 @@ build4c:
     - env
     - sh ${HOME}/build-install-ngx-voms.sh -d -c
     - mv ${HOME}/local local
-    - mv ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6 nginx
+    - mv ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6 nginx-1.13.6
   artifacts:
     paths:
       - local
@@ -26,7 +26,7 @@ test4c:
   script:
     - rm -rf ${HOME}/local/
     - mv local ${HOME}
-    - mv nginx ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6
+    - mv nginx-1.13.6 ${HOME}/openresty-1.13.6.1/build/
     - sh test-ngx-voms.sh
     - sh cov-ngx-voms.sh
     - mv cov coverage
