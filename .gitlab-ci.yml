@@ -7,16 +7,6 @@ stages:
   - test
   - deploy
 
-build:
-  stage: build
-  script:
-    - env
-    - sh ${HOME}/build-install-ngx-voms.sh
-    - mv ${HOME}/local local
-  artifacts:
-    paths:
-      - local
-
 build4c:
   stage: build
   script:
