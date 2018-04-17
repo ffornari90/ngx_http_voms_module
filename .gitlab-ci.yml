@@ -30,7 +30,7 @@ test4c:
     - mv nginx-1.13.6 ${HOME}/openresty-1.13.6.1/build/
     - sh test-ngx-voms.sh
     - sh cov-ngx-voms.sh
-    - mv cov coverage
+    - mv /tmp/coverage-report coverage
   artifacts:
     paths:
       - coverage
