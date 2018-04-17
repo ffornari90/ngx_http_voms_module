@@ -37,7 +37,7 @@ test4c:
 pages:
   stage: deploy
   dependencies:
-    - coverage
+    - test4c
   script:
     - mv coverage/ public/
   artifacts:
