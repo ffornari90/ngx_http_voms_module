@@ -17,20 +17,26 @@ build:
     paths:
       - local
 
-test:
-  stage: test
-  dependencies:
-    - build
-  script:
-    - rm -rf ${HOME}/local/
-    - mv local ${HOME}
-    - sh test-ngx-voms.sh
-
-coverage:
-  stage: test
+build4c:
+  stage: build
   script:
     - env
     - sh ${HOME}/build-install-ngx-voms.sh -d -c
+    - mv ${HOME}/local local
+    - mv ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6 nginx
+  artifacts:
+    paths:
+      - local
+      - nginx
+
+test4c:
+  stage: test
+  dependencies:
+    - build4c
+  script:
+    - rm -rf ${HOME}/local/
+    - mv local ${HOME}
+    - mv nginx ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6
     - sh test-ngx-voms.sh
     - sh cov-ngx-voms.sh
     - mv cov coverage
