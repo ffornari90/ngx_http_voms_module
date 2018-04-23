@@ -2,7 +2,7 @@
 
 [![pipeline status](https://baltig.infn.it/storm2/ngx_http_voms_module/badges/master/pipeline.svg)](https://baltig.infn.it/storm2/ngx_http_voms_module/commits/master)
 
-[![Coverage](https://storm2.baltig-pages.infn.it/ngx_http_voms_module/ruby.png?downloads=true)](https://storm2.baltig-pages.infn.it/ngx_http_voms_module)
+See [![Coverage status](https://baltig.infn.it/storm2/ngx_http_voms_module/badges/master/coverage.svg)](https://storm2.baltig-pages.infn.it/ngx_http_voms_module)
 
 ## Description
 
@@ -98,3 +98,5 @@ _Example_: ``7B``
 ## Testing
 
 Setup and files to test the *ngx\_http\_voms\_module* are contained in the `t` folder. 
+
+See [Coverage](https://storm2.baltig-pages.infn.it/ngx_http_voms_module)
