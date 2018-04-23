@@ -2,6 +2,8 @@
 
 [![pipeline status](https://baltig.infn.it/storm2/ngx_http_voms_module/badges/master/pipeline.svg)](https://baltig.infn.it/storm2/ngx_http_voms_module/commits/master)
 
+[![Coverage](https://storm2.baltig-pages.infn.it/ngx_http_voms_module/ruby.png?downloads=true)](https://storm2.baltig-pages.infn.it/ngx_http_voms_module)
+
 ## Description
 
 _ngx_http_voms_module_ is a module for the [Nginx web server](https://www.nginx.org/) that enables client-side authentication based on X.509 proxy certificates augmented with VOMS Attribute Certificates, typically obtained from a [Virtual Organization Membership Service](https://italiangrid.github.io/voms/) (VOMS) server.
