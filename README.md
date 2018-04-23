@@ -2,7 +2,7 @@
 
 [![pipeline status](https://baltig.infn.it/storm2/ngx_http_voms_module/badges/master/pipeline.svg)](https://baltig.infn.it/storm2/ngx_http_voms_module/commits/master)
 
-See [![Coverage status](https://baltig.infn.it/storm2/ngx_http_voms_module/badges/master/coverage.svg)](https://storm2.baltig-pages.infn.it/ngx_http_voms_module)
+See [Coverage pages](https://storm2.baltig-pages.infn.it/ngx_http_voms_module)
 
 ## Description
 
