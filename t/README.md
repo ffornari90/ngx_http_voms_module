@@ -43,4 +43,44 @@ The above command generates data files aside the source files for all Nginx. To 
 
 Then run the tests, e.g. with `prove`. This will create other data files with coverage information. To view that information, run `gcov <source of object file>`, e.g. `gcov /home/build/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ngx_http_voms_module.o`. This will produce files with the ``.gcov`` extension in the current directory.
 
+
 Check result on [storm2 ngx_http_voms_module pages](https://storm2.baltig-pages.infn.it/ngx_http_voms_module/)
+
+### Testing directly the NGINX server
+
+You can reuse the config file `t/servroot/conf/nginx.conf` produced by `test::Nginx`, which contains e.g. something like
+
+```
+server {
+    listen 8443 ssl;
+    server_name     nginx-voms.example;
+    ssl_certificate ../../certs/nginx_voms_example.cert.pem;
+    ssl_certificate_key ./certs/nginx_voms_example.key.pem;
+    ssl_client_certificate ./trust-anchors/igi-test-ca.pem;
+    ssl_verify_depth 10;
+    ssl_verify_client on;
+    location = / {
+        echo user: $voms_user;
+    }
+}
+```
+You may want to change the configuration so that the log goes to standard output instead of to a log file:
+```
+server {
+    error_log /dev/stdout debug;
+    ...
+```
+Start nginx:
+```
+nginx -p t/servroot
+```
+
+Modify (as root) /etc/hosts so that nginx-voms.example is an alias for localhost:
+```
+127.0.0.1	localhost nginx-voms.example
+```
+
+Then run e.g. `curl` calling directly the https endpoint:
+```
+curl https://nginx-voms.example:8443 --cert t/certs/3.pem --capath t/trust-anchors --cacert t/certs/3.cert.pem
+```
