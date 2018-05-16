@@ -43,6 +43,9 @@ The above command generates data files aside the source files for all Nginx. To 
 
 Then run the tests, e.g. with `prove`. This will create other data files with coverage information. To view that information, run `gcov <source of object file>`, e.g. `gcov /home/build/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ngx_http_voms_module.o`. This will produce files with the ``.gcov`` extension in the current directory.
 
+
+Check result on [storm2 ngx_http_voms_module pages](https://storm2.baltig-pages.infn.it/ngx_http_voms_module/)
+
 ### Testing directly the NGINX server
 
 You can reuse the config file `t/servroot/conf/nginx.conf` produced by `test::Nginx`, which contains e.g. something like

@@ -30,16 +30,14 @@
 # The script works best (i.e. it is tested) if run within a docker container
 # started from the storm2/ngx-voms-build image.
 
-if [ -r "${HOME}/openresty-env" ]; then
-    . ${HOME}/openresty-env
+#geninfo --base-directory ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ --output-filename coverage.info ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/
+geninfo --output-filename /tmp/coverage.info ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/
+genhtml --prefix ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ --ignore-errors source --demangle-cpp /tmp/coverage.info \
+  --legend --title "coverage ngix" --output-directory=/tmp/coverage-report
+
+exit_status=$?
+if [ ! $exit_status -eq 0 ]; then
+   echo "check output"
 fi
+echo $exit_status
 
-module_root=${NGX_HTTP_VOMS_MODULE_ROOT:-${CI_PROJECT_DIR:-${HOME}/ngx_http_voms_module}}
-
-if [ ! -d "${module_root}" ]; then
-    >&2 echo 'Invalid ngx_http_voms_module environment ("'${module_root}'")'
-    exit 1
-fi
-
-mkdir -p /tmp/t
-prove ${module_root}/t
