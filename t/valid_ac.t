@@ -36,6 +36,7 @@ __DATA__
     }
 --- config
     location = / {
+        error_log logs/error-proxy.log debug;
         proxy_pass https://localhost:8443/;
         proxy_ssl_certificate ../../certs/3.cert.pem;
         proxy_ssl_certificate_key ../../certs/3.key.pem;
