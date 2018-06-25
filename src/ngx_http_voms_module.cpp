@@ -233,14 +233,19 @@ static ngx_int_t get_ssl_client_ee_s_dn(ngx_http_request_t* r,
         NGX_LOG_ERR, r->connection->log, 0, "SSL_get_peer_cert_chain() failed");
     return NGX_OK;
   }
-
-  // find first non-proxy
+  
   X509* ee_cert = nullptr;
-  for (int i = 0; i != sk_X509_num(chain); ++i) {
-    auto cert = sk_X509_value(chain, i);
-    if (cert && !is_proxy(cert)) {
-      ee_cert = cert;
-      break;
+
+  if (sk_X509_num(chain) == 0) {
+    ee_cert = SSL_get_peer_certificate(r->connection->ssl->connection);
+  } else {
+    // find first non-proxy
+    for (int i = 0; i != sk_X509_num(chain); ++i) {
+      auto cert = sk_X509_value(chain, i);
+      if (cert && !is_proxy(cert)) {
+        ee_cert = cert;
+        break;
+      }
     }
   }
 

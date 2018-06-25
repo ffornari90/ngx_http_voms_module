@@ -10,7 +10,9 @@ Proxy certificates are generated using [VOMS client 3.3.1](http://italiangrid.gi
  * 4.pem: long-lived proxy with VOMS generic attributes containing reserved characters;
  * 5.pem: long-lived proxy with valid VOMS attributes, `*.lsc` file missing in `vomsdir`. 
  * 6.pem: long-lived proxy with valid VOMS attributes, with an old format for fqans. 
-
+ * 7.pem: long-lived proxy (3 delegations), without VOMS attributes;
+ * 8.pem: long-lived proxy (3 delegations), without VOMS attributes, plus CA
+   certificate included in the chain;
 
 To obtain such certificates the following command is used:
 
