@@ -67,6 +67,10 @@ static ngx_int_t generic_getter(  //
     ngx_http_request_t* r,
     ngx_http_variable_value_t* v,
     uintptr_t data);
+static ngx_int_t get_ssl_client_ee_s_dn(  //
+    ngx_http_request_t* r,
+    ngx_http_variable_value_t* v,
+    uintptr_t data);
 
 using getter_t = std::string(VomsAc const& voms);
 static getter_t get_voms_user;
@@ -170,8 +174,108 @@ static ngx_http_variable_t variables[] = {
         NGX_HTTP_VAR_NOCACHEABLE,
         0  //
     },
+    {
+        ngx_string("ssl_client_ee_s_dn"),
+        NULL,
+        get_ssl_client_ee_s_dn,
+        0,
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
     ngx_http_null_variable  //
 };
+
+static std::string to_rfc2253(X509_NAME* name)
+{
+  std::string result;
+
+  BioPtr bio(BIO_new(BIO_s_mem()), &BIO_free);
+  if (!bio) {
+    return result;
+  }
+
+  if (X509_NAME_print_ex(bio.get(), name, 0, XN_FLAG_RFC2253) < 0) {
+    return result;
+  }
+
+  auto len = BIO_pending(bio.get());
+  result.resize(len);
+
+  BIO_read(bio.get(), &result[0], result.size());
+
+  return result;
+}
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+uint32_t X509_get_extension_flags(X509* x)
+{
+  return x->ex_flags;
+}
+#endif
+
+static bool is_proxy(X509* cert)
+{
+  return X509_get_extension_flags(cert) & EXFLAG_PROXY;
+}
+
+static ngx_int_t get_ssl_client_ee_s_dn(ngx_http_request_t* r,
+                                        ngx_http_variable_value_t* v,
+                                        uintptr_t data)
+{
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
+
+  v->not_found = 1;
+  v->valid = 0;
+
+  auto chain = SSL_get_peer_cert_chain(r->connection->ssl->connection);
+  if (!chain) {
+    ngx_log_error(
+        NGX_LOG_ERR, r->connection->log, 0, "SSL_get_peer_cert_chain() failed");
+    return NGX_OK;
+  }
+
+  // find first non-proxy
+  X509* ee_cert = nullptr;
+  for (int i = 0; i != sk_X509_num(chain); ++i) {
+    auto cert = sk_X509_value(chain, i);
+    if (cert && !is_proxy(cert)) {
+      ee_cert = cert;
+      break;
+    }
+  }
+
+  if (!ee_cert) {
+    ngx_log_error(NGX_LOG_DEBUG,
+                  r->connection->log,
+                  0,
+                  "cannot identify end-entity certificate");
+    return NGX_OK;
+  }
+
+  auto dn = X509_get_subject_name(ee_cert);
+  if (!dn) {
+    ngx_log_error(NGX_LOG_DEBUG,
+                  r->connection->log,
+                  0,
+                  "cannot get subject dn from certificate");
+    return NGX_OK;
+  }
+  std::string value = to_rfc2253(dn);
+
+  auto buffer = static_cast<u_char*>(ngx_pnalloc(r->pool, value.size()));
+  if (!buffer) {
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_pnalloc() failed");
+    return NGX_OK;
+  }
+  ngx_memcpy(buffer, value.c_str(), value.size());
+
+  v->data = buffer;
+  v->len = value.size();
+  v->valid = 1;
+  v->not_found = 0;
+  v->no_cacheable = 0;
+  return NGX_OK;
+}
 
 static ngx_int_t add_variables(ngx_conf_t* cf)
 {
