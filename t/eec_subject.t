@@ -21,6 +21,7 @@ __DATA__
 	location = / {
             default_type text/plain;
             echo $ssl_client_ee_s_dn;
+            echo $ssl_client_ee_i_dn;
         }
     }
 --- config
@@ -34,6 +35,7 @@ __DATA__
 GET / 
 --- response_body
 CN=test0,O=IGI,C=IT
+CN=Test CA,O=IGI,C=IT
 --- error_code: 200
 
 === TEST 2: standard x.509 certificate 
@@ -54,6 +56,8 @@ CN=test0,O=IGI,C=IT
             default_type text/plain;
             echo $ssl_client_ee_s_dn;
             echo $ssl_client_s_dn;
+            echo $ssl_client_ee_i_dn;
+            echo $ssl_client_i_dn;
         }
     }
 --- config
@@ -68,6 +72,8 @@ GET /
 --- response_body
 CN=nginx-voms.example,O=IGI,C=IT
 CN=nginx-voms.example,O=IGI,C=IT
+CN=Test CA,O=IGI,C=IT
+CN=Test CA,O=IGI,C=IT
 --- error_code: 200
 
 === TEST 3: three delegations proxy
@@ -87,6 +93,7 @@ CN=nginx-voms.example,O=IGI,C=IT
 	location = / {
             default_type text/plain;
             echo $ssl_client_ee_s_dn;
+            echo $ssl_client_ee_i_dn;
         }
     }
 --- config
@@ -100,6 +107,7 @@ CN=nginx-voms.example,O=IGI,C=IT
 GET / 
 --- response_body
 CN=test0,O=IGI,C=IT
+CN=Test CA,O=IGI,C=IT
 --- error_code: 200
 
 
@@ -120,6 +128,7 @@ CN=test0,O=IGI,C=IT
 	location = / {
             default_type text/plain;
             echo $ssl_client_ee_s_dn;
+            echo $ssl_client_ee_i_dn;
         }
     }
 --- config
@@ -133,4 +142,5 @@ CN=test0,O=IGI,C=IT
 GET / 
 --- response_body
 CN=test0,O=IGI,C=IT
+CN=Test CA,O=IGI,C=IT
 --- error_code: 200
