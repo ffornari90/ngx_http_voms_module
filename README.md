@@ -33,11 +33,23 @@ The Subject of the End-Entity certificate, used to sign the proxy.
 
 _Example_: ``/C=IT/O=IGI/CN=test0``
 
+### ssl_client_ee_s_dn
+
+Like `voms_user`, the Subject of the End-Entity certificate. Unlike `voms_user`, it is available even for non-VOMS proxies and is formatted according to RFC 2253.
+
+_Example_: ``CN=test0,O=IGI,C=IT``
+
 ### voms_user_ca
 
 The Issuer (Certificate Authority) of the End-Entity certificate.
 
 _Example_: ``/C=IT/O=IGI/CN=Test CA``
+
+### ssl_client_ee_i_dn
+
+Like `voms_user_ca`, the Issuer of the End-Entity certificate. Unlike `voms_user_ca`, it is available even for non-VOMS proxies and is formatted according to RFC 2253.
+
+_Example_: ``CN=Test CA,O=IGI,C=IT``
 
 ### voms_fqans
 
