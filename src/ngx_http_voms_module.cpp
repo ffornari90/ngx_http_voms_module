@@ -427,14 +427,14 @@ static ngx_int_t generic_getter(ngx_http_request_t* r,
 
   auto& ac = get_voms_ac(r);
 
-  if (ac.has_value()) {
+  if (!ac) {
     ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "get_voms_ac() failed");
     return NGX_OK;
   }
 
   using getter_p = std::string (*)(VomsAc const& voms);
   auto getter = reinterpret_cast<getter_p>(data);
-  std::string const value = getter(ac.value());
+  std::string const value = getter(*ac);
 
   auto buffer = static_cast<u_char*>(ngx_pnalloc(r->pool, value.size()));
   if (!buffer) {
