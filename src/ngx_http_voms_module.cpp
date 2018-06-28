@@ -26,6 +26,7 @@ extern "C" {
 #include <numeric>
 #include <string>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/optional.hpp>
 
 using BioPtr = std::unique_ptr<BIO, decltype(&BIO_free)>;
@@ -559,10 +560,9 @@ static ngx_int_t get_ssl_client_ee_dn(ngx_http_request_t* r,
   return NGX_OK;
 }
 
-static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r, ngx_str_t* s)
+static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r, ngx_str_t* result)
 {
   ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
-  s->len = 0;
 
   auto ee_cert = get_ee_cert(r);
 
@@ -583,20 +583,18 @@ static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r, ngx_str_t* s)
 
   if (PEM_write_bio_X509(bio.get(), ee_cert) == 0) {
     ngx_log_error(
-        NGX_LOG_ERR, r->connection->log, 0, "cannot write EEC to OpenSSL bio");
+        NGX_LOG_ERR, r->connection->log, 0, "cannot write EEC to OpenSSL BIO");
     return NGX_ERROR;
   }
 
-  size_t len = BIO_pending(bio.get());
+  result->len = BIO_pending(bio.get());
+  result->data = static_cast<u_char*>(ngx_pnalloc(r->pool, result->len));
 
-  s->len = len;
-  s->data = static_cast<u_char*>(ngx_pnalloc(r->pool, len));
-
-  if (s->data == nullptr) {
+  if (result->data == nullptr) {
     return NGX_ERROR;
   }
 
-  BIO_read(bio.get(), s->data, len);
+  BIO_read(bio.get(), result->data, result->len);
 
   return NGX_OK;
 }
@@ -610,7 +608,7 @@ static ngx_int_t get_ssl_client_ee_cert(ngx_http_request_t* r,
   v->not_found = 1;
   v->valid = 0;
 
-  ngx_str_t cert;
+  ngx_str_t cert{};
 
   if (get_ssl_client_ee_cert_raw(r, &cert) != NGX_OK) {
     return NGX_ERROR;
@@ -621,28 +619,20 @@ static ngx_int_t get_ssl_client_ee_cert(ngx_http_request_t* r,
     return NGX_OK;
   }
 
-  size_t len = cert.len - 1;
+  // the first line is not prepended with a tab
+  auto const n_tabs = std::count(cert.data, cert.data + cert.len, '\n') - 1;
+  // cert is null-terminated
+  auto const len = cert.len - 1 + n_tabs;
 
-  for (int i = 0; i < cert.len - 1; i++) {
-    if (cert.data[i] == '\n') {
-      len++;
-    }
-  }
-
-  auto buffer = static_cast<u_char*>(ngx_pnalloc(r->pool, len));
+  auto const buffer = static_cast<u_char*>(ngx_pnalloc(r->pool, len));
 
   if (!buffer) {
     return NGX_OK;
   }
 
-  u_char* p = buffer;
-
-  for (int i = 0; i < cert.len - 1; i++) {
-    *p++ = cert.data[i];
-    if (cert.data[i] == '\n') {
-      *p++ = '\t';
-    }
-  }
+  // the last newline is not to be followed by a tab
+  boost::algorithm::replace_all_copy(
+      buffer, boost::make_iterator_range_n(cert.data, len - 1), "\n", "\n\t");
 
   v->data = buffer;
   v->len = len;
