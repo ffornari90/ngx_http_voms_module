@@ -560,9 +560,12 @@ static ngx_int_t get_ssl_client_ee_dn(ngx_http_request_t* r,
   return NGX_OK;
 }
 
-static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r, ngx_str_t* result)
+static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r,
+                                            ngx_str_t* result)
 {
   ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
+
+  *result = {};
 
   auto ee_cert = get_ee_cert(r);
 
