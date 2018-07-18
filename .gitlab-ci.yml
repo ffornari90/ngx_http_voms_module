@@ -4,6 +4,7 @@ stages:
   - build
   - test
   - docker-build
+  - docker-push
   - deploy
 
 build4c:
@@ -64,10 +65,12 @@ docker-build:
     - docker push ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
 
 dockerhub-push:
-  stage: docker-build
+  stage: docker-push
   image: docker:latest
   services:
     - docker:dind
+  dependencies:
+    - docker-build
   script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - docker pull ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
