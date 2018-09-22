@@ -66,7 +66,7 @@ docker-build:
   dependencies:
     - build-no-debug
   script:
-    - cp openresty-no-debug.tar.gz ${CI_PROJECT_DIR}/docker && cd ${CI_PROJECT_DIR}/docker && sh build-image.sh
+    - cp openresty-no-debug.tar.gz ${CI_PROJECT_DIR}/docker/openresty.tar.gz && cd ${CI_PROJECT_DIR}/docker && sh build-image.sh
     - docker tag storm2/ngx-voms:latest ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - docker push ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
