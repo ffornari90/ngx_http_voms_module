@@ -22,6 +22,7 @@ extern "C" {
 #include <cassert>
 #include <chrono>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <numeric>
 #include <string>
@@ -62,8 +63,6 @@ ngx_module_t ngx_http_voms_module = {
     NULL,                  // exit master
     NGX_MODULE_V1_PADDING  //
 };
-
-static std::unique_ptr<vomsdata> vomsdata_ptr;
 
 static ngx_int_t generic_getter(  //
     ngx_http_request_t* r,
@@ -344,52 +343,62 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
     return boost::none;
   }
 
-  if (!vomsdata_ptr) {
-    vomsdata_ptr.reset(new vomsdata);
-  }
-  auto ok =
-      vomsdata_ptr->Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
+  vomsdata vd;
+
+  auto ok = vd.Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
   if (!ok) {
-    auto msg = vomsdata_ptr->ErrorMessage().c_str();
+    auto msg = vd.ErrorMessage().c_str();
     ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "%s", msg);
     return boost::none;
   }
 
-  if (vomsdata_ptr->data.empty()) {
+  if (vd.data.empty()) {
     ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "no ACs in proxy");
     return boost::none;
   }
 
-  return vomsdata_ptr->data.front();
+  return vd.data.front();
 }
+
+// note that an entry in the cache is always created if within a connection a
+// request is made to one of the voms_* variables. If the presented
+// credential is a normal certificate or a proxy without attribute certificates,
+// the unique_ptr points to a MaybeVomsAc that is empty (in the sense of an
+// std::optional)
+static std::map<ngx_connection_t*, std::unique_ptr<MaybeVomsAc>> ac_cache;
 
 static void clean_voms_ac(void* data)
 {
-  auto r = static_cast<ngx_http_request_t*>(data);
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
-
-  auto p = static_cast<MaybeVomsAc*>(
-      ngx_http_get_module_ctx(r, ngx_http_voms_module));
-  delete p;
+  auto c = static_cast<ngx_connection_t*>(data);
+  ngx_log_error(NGX_LOG_DEBUG, c->log, 0, "%s", __func__);
+  auto n = ac_cache.erase(c);
+  // we erase from the cache exactly once per connection
+  assert(n == 1);
 }
 
-static void cache_voms_ac(ngx_http_request_t* r, MaybeVomsAc* ac)
+static void cache_voms_ac(ngx_http_request_t* r,
+                          std::unique_ptr<MaybeVomsAc> acp)
 {
-  ngx_http_set_ctx(r, ac, ngx_http_voms_module);
-  auto cln = ngx_http_cleanup_add(r, 0);
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
+  auto c = r->connection;
+  auto cln = ngx_pool_cleanup_add(c->pool, 0);
   if (cln) {
+    auto r = ac_cache.insert({c, std::move(acp)});
+    // we insert into the cache exactly once per connection
+    assert(r.second);
     cln->handler = clean_voms_ac;
-    cln->data = r;
+    cln->data = c;
   } else {
     ngx_log_error(
-        NGX_LOG_ERR, r->connection->log, 0, "ngx_http_cleanup_add() failed");
+        NGX_LOG_ERR, r->connection->log, 0, "ngx_pool_cleanup_add() failed");
   }
 }
 
 static MaybeVomsAc* get_voms_ac_from_cache(ngx_http_request_t* r)
 {
-  return static_cast<MaybeVomsAc*>(
-      ngx_http_get_module_ctx(r, ngx_http_voms_module));
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
+  auto it = ac_cache.find(r->connection);
+  return it != ac_cache.end() ? it->second.get() : nullptr;
 }
 
 static MaybeVomsAc const& get_voms_ac(ngx_http_request_t* r)
@@ -399,8 +408,9 @@ static MaybeVomsAc const& get_voms_ac(ngx_http_request_t* r)
   MaybeVomsAc* acp = get_voms_ac_from_cache(r);
 
   if (!acp) {
-    acp = new MaybeVomsAc(retrieve_voms_ac_from_proxy(r));
-    cache_voms_ac(r, acp);
+    auto p = std::make_unique<MaybeVomsAc>(retrieve_voms_ac_from_proxy(r));
+    acp = p.get();
+    cache_voms_ac(r, std::move(p));
   }
 
   return *acp;
