@@ -7,6 +7,16 @@ stages:
   - docker-push
   - deploy
 
+build-no-debug:
+  stage: build
+  script:
+    - env
+    - sh ${HOME}/build-install-ngx-voms.sh
+    - mv ${HOME}/local/openresty openresty && rm openresty/nginx/sbin/nginx.old && tar cvzf openresty-no-debug.tar.gz openresty
+  artifacts:
+    paths:
+      - openresty-no-debug.tar.gz 
+
 build4c:
   stage: build
   script:
@@ -54,12 +64,9 @@ docker-build:
   services:
     - docker:dind
   dependencies:
-    - build4c
+    - build-no-debug
   script:
-    - tar xvzf artifacts.tar.gz
-    - mv local ${HOME}
-    - cd ${HOME}/local && rm openresty/nginx/sbin/nginx.old && tar cvzf openresty.tar.gz openresty
-    - mv ${HOME}/local/openresty.tar.gz ${CI_PROJECT_DIR}/docker && cd ${CI_PROJECT_DIR}/docker && sh build-image.sh
+    - cp openresty-no-debug.tar.gz ${CI_PROJECT_DIR}/docker && cd ${CI_PROJECT_DIR}/docker && sh build-image.sh
     - docker tag storm2/ngx-voms:latest ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - docker push ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
