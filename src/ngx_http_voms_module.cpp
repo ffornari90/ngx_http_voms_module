@@ -74,6 +74,11 @@ static ngx_int_t get_ssl_client_ee_dn(  //
     ngx_http_variable_value_t* v,
     uintptr_t data);
 
+static ngx_int_t get_ssl_client_ee_cert(  //
+    ngx_http_request_t* r,
+    ngx_http_variable_value_t* v,
+    uintptr_t data);
+
 using getter_t = std::string(VomsAc const& voms);
 static getter_t get_voms_user;
 static getter_t get_voms_user_ca;
@@ -192,6 +197,14 @@ static ngx_http_variable_t variables[] = {
         NGX_HTTP_VAR_NOCACHEABLE,
         0  //
     },
+    {
+        ngx_string("ssl_client_ee_cert"),
+        NULL,
+        get_ssl_client_ee_cert,
+        0,
+        NGX_HTTP_VAR_NOCACHEABLE,
+        0  //
+    },
     ngx_http_null_variable  //
 };
 
@@ -228,20 +241,14 @@ static bool is_proxy(X509* cert)
   return X509_get_extension_flags(cert) & EXFLAG_PROXY;
 }
 
-static ngx_int_t get_ssl_client_ee_dn(ngx_http_request_t* r,
-                                      ngx_http_variable_value_t* v,
-                                      uintptr_t data)
-{
-  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
-  v->not_found = 1;
-  v->valid = 0;
+static X509* get_ee_cert(ngx_http_request_t* r){
 
   auto chain = SSL_get_peer_cert_chain(r->connection->ssl->connection);
   if (!chain) {
     ngx_log_error(
         NGX_LOG_ERR, r->connection->log, 0, "SSL_get_peer_cert_chain() failed");
-    return NGX_OK;
+    return nullptr;
   }
 
   X509* ee_cert = nullptr;
@@ -258,6 +265,123 @@ static ngx_int_t get_ssl_client_ee_dn(ngx_http_request_t* r,
       }
     }
   }
+
+  return ee_cert;
+}
+
+static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r,
+                                            ngx_str_t *s)
+{
+
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
+  s->len = 0;
+
+  auto ee_cert = get_ee_cert(r);
+
+  if (!ee_cert) {
+    ngx_log_error(NGX_LOG_DEBUG,
+                  r->connection->log,
+                  0,
+                  "cannot identify end-entity certificate");
+    return NGX_OK;
+  }
+
+  
+  BioPtr bio(BIO_new(BIO_s_mem()), &BIO_free);
+  if (!bio) {
+    ngx_log_error(NGX_LOG_ERR,
+        r->connection->log,
+        0,
+        "cannot create OpenSSL BIO");
+    return NGX_ERROR;
+  }
+
+  if (PEM_write_bio_X509(bio.get(), ee_cert) == 0) {
+    ngx_log_error(NGX_LOG_ERR,
+        r->connection->log,
+        0,
+        "cannot write EEC to OpenSSL bio");
+    return NGX_ERROR;
+  }
+
+  size_t len = BIO_pending(bio.get());
+
+  s->len = len;
+  s->data = static_cast<u_char*>(ngx_pnalloc(r->pool, len));
+
+  if (s->data == nullptr) {
+    return NGX_ERROR;
+  }
+
+  BIO_read(bio.get(),s->data,len);
+
+  return NGX_OK;
+}
+
+static ngx_int_t get_ssl_client_ee_cert(ngx_http_request_t* r,
+                                        ngx_http_variable_value_t* v,
+                                        uintptr_t data)
+{
+
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
+
+  v->not_found = 1;
+  v->valid = 0;
+
+  ngx_str_t cert;
+
+  if (get_ssl_client_ee_cert_raw(r, &cert) != NGX_OK) {
+    return NGX_ERROR;
+  }
+
+  if (cert.len == 0) {
+    v->len = 0;
+    return NGX_OK;
+  }
+
+  size_t len = cert.len -1;
+
+  for (int i=0; i < cert.len - 1; i++) {
+    if (cert.data[i] == '\n') {
+      len++;
+    }
+  }
+
+  auto buffer = static_cast<u_char*>(ngx_pnalloc(r->pool, len));
+
+  if (!buffer) {
+    return NGX_OK;
+  }
+
+  u_char* p = buffer;
+
+  for (int i=0; i < cert.len - 1; i++) {
+    *p++ = cert.data[i];
+    if (cert.data[i] == '\n') {
+      *p++ = '\t';
+    }
+  }
+
+  v->data = buffer;
+  v->len = len;
+  v->valid = 1;
+  v->not_found = 0;
+  v->no_cacheable = 0;
+  return NGX_OK;
+
+}
+
+
+static ngx_int_t get_ssl_client_ee_dn(ngx_http_request_t* r,
+                                      ngx_http_variable_value_t* v,
+                                      uintptr_t data)
+{
+  ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
+
+  v->not_found = 1;
+  v->valid = 0;
+
+  auto ee_cert = get_ee_cert(r);
 
   if (!ee_cert) {
     ngx_log_error(NGX_LOG_DEBUG,
