@@ -7,7 +7,6 @@ __DATA__
 
 === TEST 1: https with x509 client authentication, valid proxy certificate with no VOMS attributes 
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1; 
     env X509_VOMS_DIR=t/vomsdir;
 --- http_config
     server {
