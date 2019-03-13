@@ -255,8 +255,8 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
 
   auto ok = vd.Retrieve(client_cert.get(), client_chain, RECURSE_CHAIN);
   if (!ok) {
-    auto msg = vd.ErrorMessage().c_str();
-    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "%s", msg);
+    auto msg = vd.ErrorMessage();
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "%s", msg.c_str());
     return boost::none;
   }
 
