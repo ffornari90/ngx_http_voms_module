@@ -7,7 +7,6 @@ __DATA__
 
 === TEST 1: https with x509 client authentication, untrusted AC signature LSC missing
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
 --- http_config
@@ -41,7 +40,6 @@ Cannot verify AC signature
 
 === TEST 2: Valid proxy, VOMS trust-anchor missing
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t;
 --- http_config

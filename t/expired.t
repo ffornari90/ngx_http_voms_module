@@ -7,7 +7,6 @@ __DATA__
 
 === TEST 1: https with x509 client authentication, expired client certificate
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1; 
 --- http_config
     server {
         error_log logs/error.log debug;

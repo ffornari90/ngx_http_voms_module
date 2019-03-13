@@ -6,7 +6,6 @@ __DATA__
 
 === TEST 1: rfc proxy certificate, no AC
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
 --- http_config
@@ -40,7 +39,6 @@ CN=Test CA,O=IGI,C=IT
 
 === TEST 2: standard x.509 certificate 
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
 --- http_config
@@ -78,7 +76,6 @@ CN=Test CA,O=IGI,C=IT
 
 === TEST 3: three delegations proxy
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
 --- http_config
@@ -113,7 +110,6 @@ CN=Test CA,O=IGI,C=IT
 
 === TEST 4: three delegations proxy + CA cert
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
 --- http_config

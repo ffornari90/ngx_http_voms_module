@@ -38,16 +38,18 @@ using MaybeVomsAc = boost::optional<VomsAc>;
 enum class EeDn { SUBJECT, ISSUER };
 
 static ngx_int_t add_variables(ngx_conf_t* cf);
+static ngx_int_t ngx_ssl_allow_proxy_certs(ngx_ssl_t* ssl);
+static char* ngx_http_voms_merge_srv_conf(ngx_conf_t* cf, void*, void*);
 
 static ngx_http_module_t ctx = {
-    add_variables,  // preconfiguration
-    NULL,           // postconfiguration
-    NULL,           // create main configuration
-    NULL,           // init main configuration
-    NULL,           // create server configuration
-    NULL,           // merge server configuration
-    NULL,           // create location configuration
-    NULL            // merge location configuration
+    add_variables,                 // preconfiguration
+    NULL,                          // postconfiguration
+    NULL,                          // create main configuration
+    NULL,                          // init main configuration
+    NULL,                          // create server configuration
+    ngx_http_voms_merge_srv_conf,  // merge server configuration
+    NULL,                          // create location configuration
+    NULL                           // merge location configuration
 };
 
 ngx_module_t ngx_http_voms_module = {
@@ -222,6 +224,36 @@ static ngx_int_t add_variables(ngx_conf_t* cf)
   }
 
   return NGX_OK;
+}
+
+static ngx_int_t ngx_ssl_allow_proxy_certs(ngx_ssl_t* ssl)
+{
+  X509_STORE* store = SSL_CTX_get_cert_store(ssl->ctx);
+  if (store == NULL) {
+    ngx_ssl_error(NGX_LOG_EMERG,
+                  ssl->log,
+                  0,
+                  const_cast<char*>("SSL_CTX_get_cert_store() failed"));
+    return NGX_ERROR;
+  }
+
+  X509_STORE_set_flags(store, X509_V_FLAG_ALLOW_PROXY_CERTS);
+
+  return NGX_OK;
+}
+
+static char* ngx_http_voms_merge_srv_conf(ngx_conf_t* cf, void*, void*)
+{
+  auto conf = static_cast<ngx_http_ssl_srv_conf_t*>(
+      ngx_http_conf_get_module_srv_conf(cf, ngx_http_ssl_module));
+
+  if (conf->ssl.ctx != nullptr) {
+    if (ngx_ssl_allow_proxy_certs(&conf->ssl) != NGX_OK) {
+      return static_cast<char*>(NGX_CONF_ERROR);
+    }
+  }
+
+  return NGX_CONF_OK;
 }
 
 // return the first AC, if present

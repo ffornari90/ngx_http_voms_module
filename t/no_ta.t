@@ -7,7 +7,6 @@ __DATA__
 
 === TEST 1: Valid proxy, wrong client trust-anchor 
 --- main_config
-    env OPENSSL_ALLOW_PROXY_CERTS=1;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
 --- http_config
