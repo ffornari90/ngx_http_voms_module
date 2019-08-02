@@ -519,7 +519,7 @@ static uint32_t X509_get_extension_flags(X509* x)
 
 static bool is_ca(X509* cert)
 {
-  return X509_get_extension_flags(cert) & EXFLAG_CA;
+  return X509_check_ca(cert) != 0;
 }
 
 static bool is_proxy(X509* cert)
@@ -544,10 +544,17 @@ static X509* get_ee_cert(ngx_http_request_t* r)
     // find first non-proxy and non-ca cert
     for (int i = 0; i != sk_X509_num(chain); ++i) {
       auto cert = sk_X509_value(chain, i);
-      if (cert && !is_proxy(cert) && !is_ca(cert)) {
+      if (is_ca(cert)) {
+        break;
+      }
+      if (cert && !is_proxy(cert)) {
         ee_cert = cert;
         break;
       }
+    }
+
+    if (!ee_cert) {
+      ee_cert = SSL_get_peer_certificate(r->connection->ssl->connection);
     }
   }
 
