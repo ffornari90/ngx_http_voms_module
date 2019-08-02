@@ -544,7 +544,7 @@ static X509* get_ee_cert(ngx_http_request_t* r)
     // find first non-proxy and non-ca cert
     for (int i = 0; i != sk_X509_num(chain); ++i) {
       auto cert = sk_X509_value(chain, i);
-      if (is_ca(cert)) {
+      if (cert && is_ca(cert)) {
         break;
       }
       if (cert && !is_proxy(cert)) {
