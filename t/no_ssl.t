@@ -12,7 +12,7 @@ __DATA__
     server {
         error_log logs/error.log debug;
         listen 8443;
-	location = / {
+        location = / {
             default_type text/plain;
             echo $voms_user;
         }
