@@ -266,6 +266,11 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
     return boost::none;
   }
 
+  if (!r->connection->ssl) {
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "plain HTTP request");
+    return boost::none;
+  }
+
   auto client_cert = X509Ptr{
       SSL_get_peer_certificate(r->connection->ssl->connection), X509_free};
   if (!client_cert) {
