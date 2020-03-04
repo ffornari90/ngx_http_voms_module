@@ -57,7 +57,7 @@ push-to-dockerhub:
     - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
     - cd docker && cd ngx-voms-packaging && pull-docker-image.sh && cd .. && unset DOCKER_REGISTRY_HOST
     - docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
-    - cd ngx-voms-packaging && push-docker-images.sh
+    - cd ngx-voms-packaging && push-docker-image.sh
   only:
     - master
 
