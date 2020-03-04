@@ -1,90 +1,63 @@
+#image: ${CI_REGISTRY}/storm2/build/ngx-voms-build:master-latest
 image: storm2/ngx-voms-build:latest
 
 stages:
   - build
-  - test
   - docker-build
   - docker-push
-  - deploy
 
-build-no-debug:
+build-rpm:
   stage: build
   script:
-    - env
-    - sh ${HOME}/build-install-ngx-voms.sh
-    - mv ${HOME}/local/openresty openresty && rm openresty/nginx/sbin/nginx.old && tar cvzf openresty-no-debug.tar.gz openresty
+    - env | sort
+    - export VOMS_MODULE_HOME=${CI_PROJECT_DIR}
+    - cd rpm && sh make_packaging.sh && cd ..
+    - mv ${HOME}/rpmbuild.tar.gz .
+    - mv ${HOME}/rpmbuild ./rpmbuild
   artifacts:
     paths:
-      - openresty-no-debug.tar.gz 
+      - rpmbuild.tar.gz
+      - rpmbuild/SRPMS/
+      - rpmbuild/RPMS/noarch/
+      - rpmbuild/RPMS/x86_64/
 
-build4c:
-  stage: build
-  script:
-    - env
-    - sh ${HOME}/build-install-ngx-voms.sh -d -c
-    - mv ${HOME}/local local
-    - mv ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6 nginx-1.13.6
-    - tar cvzf artifacts.tar.gz local nginx-1.13.6
-  artifacts:
-    paths:
-      - artifacts.tar.gz
-
-test4c:
-  stage: test
-  dependencies:
-    - build4c
-  script:
-    - rm -rf ${HOME}/local/
-    - rm -rf ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/
-    - tar xvzf artifacts.tar.gz
-    - mv local ${HOME}
-    - mv nginx-1.13.6 ${HOME}/openresty-1.13.6.1/build/
-    - sh test-ngx-voms.sh
-    - sh cov-ngx-voms.sh
-    - mv /tmp/coverage-report coverage
-  artifacts:
-    paths:
-      - coverage
-
-pages:
-  stage: deploy
-  image: docker:latest
-  dependencies:
-    - test4c
-  script:
-    - mv coverage/ public/
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
-
-docker-build:
+docker-build-rpm:
   stage: docker-build
   image: docker:latest
   services:
     - docker:dind
   dependencies:
-    - build-no-debug
+    - build-rpm
   script:
-    - cp openresty-no-debug.tar.gz ${CI_PROJECT_DIR}/docker/openresty.tar.gz && cd ${CI_PROJECT_DIR}/docker && sh build-image.sh
-    - docker tag storm2/ngx-voms:latest ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
+    - apk add git bash
+    - git clone https://baltig.infn.it/mw-devel/helper-scripts.git helper-scripts
+    - cp helper-scripts/scripts/* /usr/local/bin
+    - cp rpmbuild/RPMS/x86_64/* ${CI_PROJECT_DIR}/docker/ngx-voms-packaging/
+    - cp rpmbuild/RPMS/noarch/* ${CI_PROJECT_DIR}/docker/ngx-voms-packaging/
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker push ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
+    - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
+    - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
+    - cd docker && cd ngx-voms-packaging && build-docker-image.sh && push-docker-image.sh
 
-dockerhub-push:
+push-to-dockerhub:
   stage: docker-push
   image: docker:latest
   services:
     - docker:dind
   dependencies:
-    - docker-build
+    - docker-build-rpm
   script:
+    - apk add git bash
+    - git clone https://baltig.infn.it/mw-devel/helper-scripts.git helper-scripts
+    - cp helper-scripts/scripts/* /usr/local/bin
+    - export DOCKER_PUSH_TO_DOCKERHUB=y
+    - env | sort
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker pull ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8}
-    - docker tag ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8} storm2/ngx-voms:${CI_COMMIT_SHA:0:8}
-    - docker tag ${CI_REGISTRY_IMAGE}/ngx-voms:${CI_COMMIT_SHA:0:8} storm2/ngx-voms:latest
+    - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
+    - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
+    - cd docker && cd ngx-voms-packaging && pull-docker-image.sh && cd .. && unset DOCKER_REGISTRY_HOST
     - docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
-    - docker push storm2/ngx-voms:${CI_COMMIT_SHA:0:8}
-    - docker push storm2/ngx-voms:latest
+    - cd ngx-voms-packaging && push-docker-images.sh
   only:
     - master
+

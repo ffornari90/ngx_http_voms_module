@@ -31,8 +31,8 @@
 # started from the storm2/ngx-voms-build image.
 
 #geninfo --base-directory ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ --output-filename coverage.info ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/
-geninfo --output-filename /tmp/coverage.info ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/
-genhtml --prefix ${HOME}/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ --ignore-errors source --demangle-cpp /tmp/coverage.info \
+geninfo --output-filename /tmp/coverage.info ${HOME}/openresty-1.15.8.1/build/nginx-1.15.8/objs/addon/src/
+genhtml --prefix ${HOME}/openresty-1.15.8.1/build/nginx-1.15.8/objs/addon/src/ --ignore-errors source --demangle-cpp /tmp/coverage.info \
   --legend --title "coverage ngix" --output-directory=/tmp/coverage-report
 
 exit_status=$?
