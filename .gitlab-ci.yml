@@ -16,7 +16,6 @@ build-rpm:
     - mv ${HOME}/rpmbuild ./rpmbuild
   artifacts:
     paths:
-      - rpmbuild.tar.gz
       - rpmbuild/SRPMS/
       - rpmbuild/RPMS/noarch/
       - rpmbuild/RPMS/x86_64/
@@ -60,4 +59,3 @@ push-to-dockerhub:
     - cd ngx-voms-packaging && push-docker-image.sh
   only:
     - master
-
