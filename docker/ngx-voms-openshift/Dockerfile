@@ -13,7 +13,7 @@ RUN  \
           yum -y install voms zlib pcre readline gettext && \ 
           mkdir /pkgs
 
-ADD *.rpm /pkgs
+ADD *.rpm /pkgs/
 
 RUN yum -y localinstall /pkgs/*.rpm
 
