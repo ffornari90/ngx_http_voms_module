@@ -12,7 +12,6 @@ build-rpm:
     - env | sort
     - export VOMS_MODULE_HOME=${CI_PROJECT_DIR}
     - cd rpm && sh make_packaging.sh && cd ..
-    - mv ${HOME}/rpmbuild.tar.gz .
     - mv ${HOME}/rpmbuild ./rpmbuild
   artifacts:
     paths:
