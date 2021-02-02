@@ -28,4 +28,4 @@ rpmbuild -ba openresty-voms.spec
 
 cd ~
 
-tar cvzf rpmbuild.tar.gz rpmbuild
+# tar cvzf rpmbuild.tar.gz rpmbuild
