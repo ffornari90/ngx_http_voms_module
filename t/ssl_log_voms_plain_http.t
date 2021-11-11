@@ -1,10 +1,4 @@
 
-# This test is always successful because, for some reason (a bug?)
-# the error.log as seen in Test::Nginx doesn't contain the entries for
-# the master process, although they are evailable in the actual file.
-# As a consequence the no_error_log check is always satisfied,
-# even if the segmentation fault were present
-
 use Test::Nginx::Socket 'no_plan';
 
 master_on();
@@ -55,7 +49,5 @@ GET /lua
 --- error_log
 client prematurely closed connection
 retrieve_voms_ac_from_proxy
-plain http
---- no_error_log
-signal 11
+plain HTTP
 --- error_code: 200
