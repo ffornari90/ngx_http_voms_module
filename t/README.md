@@ -1,54 +1,52 @@
-# ngx\_http\_voms\_module Testing 
+# `ngx_http_voms_module` Testing 
 
 ## Description
 
-Setup and files to test the *ngx\_http\_voms\_module* are contained in the `t` folder. The [Openresty data-driven testsuite](https://openresty.gitbooks.io/programming-openresty/content/testing/) has been adopted for testing.
+Setup and files to test the *ngx_http_voms_module* are contained in the `t` folder. The [Openresty data-driven testsuite](https://openresty.gitbooks.io/programming-openresty/content/testing/) has been adopted for testing.
 
 ### Test fixture setup 
 
-Proxy certificates are in the `certs` folder (see [README.md](certs/README.md) for further details), while trust-anchors (e.g. igi-test-ca.pem) are contained in `trust-anchors`. 
+All the certificates and proxy certificates used in the tests are in the [`certs`](certs) folder (see that [README](certs/README.md) for further details), while trust-anchors (e.g. igi-test-ca.pem) are in the [`trust-anchors`](trust-anchors) folder.
 
-Nginx server certificate and key are nginx\_voms\_example.cert.pem and nginx\_voms\_example\_key.pem, respectively, and they are contained in `certs`.
+`vomses` is the _vomses_ file needed for the generation of proxy certificates.
 
-To perform correctly the VOMS AC validation, a \*.lsc or \*.pem file is needed, see [VOMS client 3.3.0 User Guide](http://italiangrid.github.io/voms/documentation/voms-clients-guide/3.0.3/) for further details. The *voms.example.lsc* can be found in `vomsdir/test.vo`.
+The LSC file `voms.example.lsc`, needed to perform correctly the VOMS AC validation, is in the [`vomsdir/test.vo`](vomsdir/test.vo) folder.
 
 ### Running Tests
 
 To run the tests made available in `t` just type
 
-	prove -v 
+```shell
+$ prove -v 
+```
 
 from `t`' s parent directory.
 
-Using the docker image provided to exploit Openresty in the Storm2 project (see [README.md](../README.md) for further details):
+The `prove` command creates a directory called `servroot` in `t`, so if the `t` folder is accessible read-only, for
+example in a docker container, just make a copy somewhere else and run the tests from there:
 
-    cp -r t /tmp
-    cd /tmp
-    prove -v
-
-A copy of the `t` folder is needed since the `prove` command creates a directory `servroot` in `t`.  
+```
+cp -r t /tmp
+cd /tmp
+prove -v
+```
 
 ### Test coverage
 
-To enable test coverage pass the `--coverage` option to both the compiler and the linker. For example, if the build happens inside the ``storm2/nginx-voms-build`` image:
+To enable test coverage pass the `--coverage` option to both the compiler and the linker. For example:
 
+```shell
+$ ./configure ${RESTY_CONFIG_OPTIONS} --add-module=../ngx_http_voms_module --with-debug --with-cc-opt="-g -Og --coverage" --with-ld-opt="--coverage"
+$ make && make install
 ```
-    % ./configure ${RESTY_CONFIG_OPTIONS} --add-module=../ngx_http_voms_module --with-debug --with-cc-opt="-g -O0 --coverage" --with-ld-opt="--coverage"
-    % make && make install
-```
 
-Building in debug mode, with no optimizations, helps to better associate coverage information to source code.
+The above command generates data files aside the source files for all Nginx. To enable coverage only for `ngx_http_voms_module` the `--coverage` option should be passed only when compiling `ngx_http_voms_module.cpp`, adding the option to `config.make`.
 
-The above command generates data files aside the source files for all Nginx. To enable coverage only for ``ngx_http_voms_module`` the ``--coverage`` option should be passed only when compiling ``ngx_http_voms_module.cpp`` (to be done).
+Running the tests will then create other data files with coverage information. To view that information, run `gcov <object file>`, e.g. `gcov .../objs/addon/src/ngx_http_voms_module.o`. This will produce files with the `.gcov` extension in the current directory.
 
-Then run the tests, e.g. with `prove`. This will create other data files with coverage information. To view that information, run `gcov <source of object file>`, e.g. `gcov /home/build/openresty-1.13.6.1/build/nginx-1.13.6/objs/addon/src/ngx_http_voms_module.o`. This will produce files with the ``.gcov`` extension in the current directory.
+### Testing directly the Nginx server
 
-
-Check result on [storm2 ngx_http_voms_module pages](https://storm2.baltig-pages.infn.it/ngx_http_voms_module/)
-
-### Testing directly the NGINX server
-
-You can reuse the config file `t/servroot/conf/nginx.conf` produced by `test::Nginx`, which contains e.g. something like
+You can reuse the config file `t/servroot/conf/nginx.conf` produced by `test::Nginx`, which contains something like
 
 ```
 server {
@@ -64,23 +62,29 @@ server {
     }
 }
 ```
+
 You may want to change the configuration so that the log goes to standard output instead of to a log file:
+
 ```
 server {
     error_log /dev/stdout debug;
     ...
 ```
+
 Start nginx:
-```
-nginx -p t/servroot
+
+```shell
+$ nginx -p t/servroot
 ```
 
-Modify (as root) /etc/hosts so that nginx-voms.example is an alias for localhost:
+Modify (as root) `/etc/hosts` so that `nginx-voms.example` is an alias for `localhost`:
+
 ```
 127.0.0.1	localhost nginx-voms.example
 ```
 
-Then run e.g. `curl` calling directly the https endpoint:
-```
-curl https://nginx-voms.example:8443 --cert t/certs/3.pem --capath t/trust-anchors --cacert t/certs/3.cert.pem
+Then run for example `curl`, calling directly the HTTPS endpoint:
+
+```shell
+$ curl https://nginx-voms.example:8443 --cert t/certs/3.pem --capath t/trust-anchors --cacert t/certs/3.cert.pem
 ```
