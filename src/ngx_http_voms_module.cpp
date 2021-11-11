@@ -328,7 +328,7 @@ static void cache_voms_ac(ngx_http_request_t* r,
   auto c = r->connection;
   auto cln = ngx_pool_cleanup_add(c->pool, 0);
   if (cln) {
-    auto r = ac_cache.insert({c, std::move(acp)});
+    auto r = ac_cache.insert(std::make_pair(c, std::move(acp)));
     // we insert into the cache exactly once per connection
     assert(r.second);
     cln->handler = clean_voms_ac;
@@ -353,7 +353,7 @@ static MaybeVomsAc const& get_voms_ac(ngx_http_request_t* r)
   MaybeVomsAc* acp = get_voms_ac_from_cache(r);
 
   if (!acp) {
-    auto p = std::make_unique<MaybeVomsAc>(retrieve_voms_ac_from_proxy(r));
+    std::unique_ptr<MaybeVomsAc> p{new MaybeVomsAc(retrieve_voms_ac_from_proxy(r))};
     acp = p.get();
     cache_voms_ac(r, std::move(p));
   }
@@ -624,7 +624,7 @@ static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r,
 {
   ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
-  *result = {};
+  *result = {0, nullptr};
 
   auto ee_cert = get_ee_cert(r);
 
@@ -661,6 +661,15 @@ static ngx_int_t get_ssl_client_ee_cert_raw(ngx_http_request_t* r,
   return NGX_OK;
 }
 
+namespace boost {
+template <typename IteratorT, typename IntegerT>
+inline iterator_range<IteratorT> make_iterator_range_n(IteratorT first,
+                                                       IntegerT n)
+{
+  return iterator_range<IteratorT>(first, boost::next(first, n));
+}
+}  // namespace boost
+
 static ngx_int_t get_ssl_client_ee_cert(ngx_http_request_t* r,
                                         ngx_http_variable_value_t* v,
                                         uintptr_t data)
@@ -670,7 +679,7 @@ static ngx_int_t get_ssl_client_ee_cert(ngx_http_request_t* r,
   v->not_found = 1;
   v->valid = 0;
 
-  ngx_str_t cert{};
+  ngx_str_t cert{0, nullptr};
 
   if (get_ssl_client_ee_cert_raw(r, &cert) != NGX_OK) {
     return NGX_ERROR;
