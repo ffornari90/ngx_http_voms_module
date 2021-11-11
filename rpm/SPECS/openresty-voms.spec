@@ -1,5 +1,5 @@
 Name:           openresty-voms
-Version:        1.15.8.1
+Version:        1.19.9.1
 Release:        7%{?dist}
 Summary:        OpenResty with Voms
 
@@ -37,7 +37,7 @@ Requires: voms
 
 # The path location is /usr/local/openresty-voms, therefore I can avoid to handle 
 # Conflicts for standard rpm
-# Conflicts:      openresty >= 1.15.8.2
+# Conflicts:      openresty
 
 %if 0%{?suse_version}
 
@@ -122,7 +122,7 @@ Requires:       perl(File::Spec), perl(FindBin), perl(List::Util), perl(Getopt::
 
 # The path location is /usr/local/openresty-voms, therefore I can avoid to handle 
 # Conflicts for standard rpm
-# Conflicts:      openresty-resty >= 1.15.8.2
+# Conflicts:      openresty-resty
 
 %if 0%{?fedora} >= 10 || 0%{?rhel} >= 6 || 0%{?centos} >= 6
 BuildArch:      noarch
