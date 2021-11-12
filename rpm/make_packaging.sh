@@ -1,31 +1,30 @@
 #!/bin/sh
 
+voms_module_prefix=${HOME}/ngx_http_voms_module
+if [ $# -eq 1 ]; then
+    voms_module_prefix=$1
+fi
+
+if [ ! -d "$voms_module_prefix" ]; then
+    echo "$voms_module_prefix doesn't exist" >&2
+    exit 1
+fi
+
 # install rpm build tools:
 sudo yum install -y rpm-build redhat-rpm-config rpmdevtools
 
-# install openresty's build requirements:
-sudo yum install -y gcc make perl \
-    perl-Data-Dumper libtool ElectricFence systemtap-sdt-devel valgrind-devel \
-    ccache clang boost-devel
+mkdir -p ${HOME}/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+cat <<EOF > ${HOME}/.rpmmacros
+%_topdir %{getenv:HOME}/rpmbuild
+%voms_module_prefix ${voms_module_prefix}
+EOF
 
-mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
+cat ${HOME}/.rpmmacros
 
-cp ${HOME}/nginx-httpg_no_delegation.patch ~/rpmbuild/SOURCES/
+cp ${HOME}/nginx-httpg_no_delegation.patch ${HOME}/rpmbuild/SOURCES/
 
-cp SOURCES/* ~/rpmbuild/SOURCES/
-cp SPECS/*.spec ~/rpmbuild/SPECS/
+cp SOURCES/* ${HOME}/rpmbuild/SOURCES/
+cp SPECS/*.spec ${HOME}/rpmbuild/SPECS/
 
-cd ~/rpmbuild/SPECS
-
-for file in *.spec; do
-    spectool -g -R $file
-done
-
-cat ${CI_PROJECT_DIR}/.rpmmacros
-
-rpmbuild -ba openresty-voms.spec
-
-cd ~
-
-# tar cvzf rpmbuild.tar.gz rpmbuild
+spectool -g -R ${HOME}/rpmbuild/SPECS/openresty-voms.spec
+rpmbuild -ba ${HOME}/rpmbuild/SPECS/openresty-voms.spec

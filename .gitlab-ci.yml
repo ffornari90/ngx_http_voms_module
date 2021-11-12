@@ -10,8 +10,7 @@ build-rpm:
   stage: build
   script:
     - env | sort
-    - export VOMS_MODULE_HOME=${CI_PROJECT_DIR}
-    - cd rpm && sh make_packaging.sh && cd ..
+    - cd rpm && sh make_packaging.sh ${CI_PROJECT_DIR} && cd ..
     - mv ${HOME}/rpmbuild ./rpmbuild
   artifacts:
     paths:
@@ -23,7 +22,8 @@ docker-build-rpm:
   stage: docker-build
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false"]
   dependencies:
     - build-rpm
   script:
@@ -42,7 +42,8 @@ push-to-dockerhub:
   stage: docker-push
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false"]
   dependencies:
     - docker-build-rpm
   script:
