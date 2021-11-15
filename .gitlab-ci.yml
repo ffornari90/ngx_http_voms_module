@@ -1,5 +1,5 @@
-#image: ${CI_REGISTRY}/storm2/build/ngx-voms-build:master-latest
-image: storm2/ngx-voms-build:latest
+image: ${CI_REGISTRY}/storm2/build/ngx-voms-build:issue-17-latest
+#image: storm2/ngx-voms-build:latest
 
 stages:
   - build
