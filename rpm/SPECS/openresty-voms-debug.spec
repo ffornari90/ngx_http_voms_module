@@ -239,6 +239,7 @@ rm -rf %{buildroot}%{orprefix}/luajit/share/man
 rm -rf %{buildroot}%{orprefix}/luajit/lib/libluajit-5.1.a
 
 mkdir -p %{buildroot}/usr/bin
+mv %{buildroot}%{orprefix}/bin/openresty %{buildroot}%{orprefix}/bin/%{name}
 ln -sf %{orprefix}/bin/resty %{buildroot}/usr/bin/
 ln -sf %{orprefix}/bin/restydoc %{buildroot}/usr/bin/
 ln -sf %{orprefix}/bin/opm %{buildroot}/usr/bin/
