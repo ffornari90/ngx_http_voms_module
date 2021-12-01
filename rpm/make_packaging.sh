@@ -10,9 +10,6 @@ if [ ! -d "$voms_module_prefix" ]; then
     exit 1
 fi
 
-# install rpm build tools:
-sudo yum install -y rpm-build redhat-rpm-config rpmdevtools
-
 mkdir -p ${HOME}/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 cat <<EOF > ${HOME}/.rpmmacros
 %_topdir %{getenv:HOME}/rpmbuild
@@ -21,7 +18,7 @@ EOF
 
 cat ${HOME}/.rpmmacros
 
-cp ${HOME}/nginx-httpg_no_delegation.patch ${HOME}/rpmbuild/SOURCES/
+cp ${voms_module_prefix}/nginx-httpg_no_delegation.patch ${HOME}/rpmbuild/SOURCES/
 
 cp SOURCES/* ${HOME}/rpmbuild/SOURCES/
 cp SPECS/*.spec ${HOME}/rpmbuild/SPECS/
