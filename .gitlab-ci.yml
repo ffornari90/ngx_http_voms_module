@@ -23,7 +23,8 @@ docker-build-rpm:
   stage: docker-build
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false"]
   dependencies:
     - build-rpm
   script:
@@ -42,7 +43,8 @@ push-to-dockerhub:
   stage: docker-push
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--tls=false"]
   dependencies:
     - docker-build-rpm
   script:
