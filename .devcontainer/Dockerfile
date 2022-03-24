@@ -1,4 +1,4 @@
-FROM storm2/ngx-voms-build
+FROM baltig.infn.it:4567/storm2/build/ngx-voms-build:issue-17-latest
 
 USER root
 
