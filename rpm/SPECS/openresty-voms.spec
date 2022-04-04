@@ -1,7 +1,7 @@
 Name:           openresty-voms
-Version:        1.15.8.1
-Release:        7%{?dist}
-Summary:        OpenResty with Voms
+Version:        1.19.9.1
+Release:        1%{?dist}
+Summary:        OpenResty, scalable web platform by extending NGINX with Lua, with HTTPG and VOMS support
 
 Group:          System Environment/Daemons
 
@@ -12,32 +12,27 @@ URL:            https://openresty.org/
 
 Source0:        https://openresty.org/download/openresty-%{version}.tar.gz
 Patch0:         nginx-httpg_no_delegation.patch    
-   
+
 %if 0%{?amzn} >= 2 || 0%{?suse_version} || 0%{?fedora} || 0%{?rhel} >= 7
 %define         use_systemd   1
 %endif
 
-Source1:        openresty-voms.service
-Source2:        openresty-voms.init
+Source1:        %{name}.service
+Source2:        %{name}.init
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-File-Temp
 BuildRequires:  ccache, gcc, make, perl, systemtap-sdt-devel
-BuildRequires: zlib-devel >= 1.2.7-18
-BuildRequires: openssl-devel >= 1.0.2k-19
-BuildRequires: pcre-devel >= 8.32-17
-BuildRequires: voms-devel
-BuildRequires: boost-devel
-Requires: zlib >= 1.2.7-18
-Requires: openssl >= 1.0.2k-19
-Requires: pcre >= 8.32-17
-Requires: voms
-
-
-# The path location is /usr/local/openresty-voms, therefore I can avoid to handle 
-# Conflicts for standard rpm
-# Conflicts:      openresty >= 1.15.8.2
+BuildRequires:  zlib-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pcre-devel
+BuildRequires:  voms-devel
+BuildRequires:  boost-devel
+Requires:       zlib
+Requires:       openssl
+Requires:       pcre
+Requires:       voms
 
 %if 0%{?suse_version}
 
@@ -67,31 +62,6 @@ Requires(preun): chkconfig, initscripts
 AutoReqProv:        no
 
 %define orprefix            %{_usr}/local/%{name}
-#%define oroprefix           %{_usr}/local/openresty
-%define zlib_prefix         /usr
-%define pcre_prefix         /usr
-%define openssl_prefix      %{orprefix}/openssl
-
-%define voms_module_prefix  ${VOMS_MODULE_HOME}
-
-# Remove source code from debuginfo package.
-%define __debug_install_post \
-  %{_rpmconfigdir}/find-debuginfo.sh %{?_missing_build_ids_terminate_build:--strict-build-id} %{?_find_debuginfo_opts} "%{_builddir}/%{?buildsubdir}"; \
-  rm -rf "${RPM_BUILD_ROOT}/usr/src/debug"; \
-  mkdir -p "${RPM_BUILD_ROOT}/usr/src/debug/openresty-%{version}"; \
-  mkdir -p "${RPM_BUILD_ROOT}/usr/src/debug/tmp"; \
-  mkdir -p "${RPM_BUILD_ROOT}/usr/src/debug/builddir"; \
-%{nil}
-
-%if 0%{?fedora} >= 27
-%undefine _debugsource_packages
-%undefine _debuginfo_subpackages
-%endif
-
-%if 0%{?rhel} >= 8
-%undefine _debugsource_packages
-%undefine _debuginfo_subpackages
-%endif
 
 
 %description
@@ -113,16 +83,40 @@ web applications that are capable to handle 10K ~ 1000K+ connections in
 a single box.
 
 
+%if 0%{?suse_version}
+
+%debug_package
+
+%else
+
+# Remove source code from debuginfo package.
+%define __debug_install_post \
+    %{_rpmconfigdir}/find-debuginfo.sh %{?_missing_build_ids_terminate_build:--strict-build-id} %{?_find_debuginfo_opts} "%{_builddir}/%{?buildsubdir}"; \
+    rm -rf "${RPM_BUILD_ROOT}/usr/src/debug"; \
+    mkdir -p "${RPM_BUILD_ROOT}/usr/src/debug/openresty-%{version}"; \
+    mkdir -p "${RPM_BUILD_ROOT}/usr/src/debug/tmp"; \
+    mkdir -p "${RPM_BUILD_ROOT}/usr/src/debug/builddir"; \
+%{nil}
+
+%endif
+
+%if 0%{?fedora} >= 27
+%undefine _debugsource_packages
+%undefine _debuginfo_subpackages
+%endif
+
+%if 0%{?rhel} >= 8
+%undefine _debugsource_packages
+%undefine _debuginfo_subpackages
+%endif
+
+
 %package resty
 
 Summary:        OpenResty command-line utility, resty
 Group:          Development/Tools
-Requires:       perl, openresty-voms >= %{version}-%{release}
+Requires:       perl, %{name} >= %{version}-%{release}
 Requires:       perl(File::Spec), perl(FindBin), perl(List::Util), perl(Getopt::Long), perl(File::Temp), perl(POSIX), perl(Time::HiRes)
-
-# The path location is /usr/local/openresty-voms, therefore I can avoid to handle 
-# Conflicts for standard rpm
-# Conflicts:      openresty-resty >= 1.15.8.2
 
 %if 0%{?fedora} >= 10 || 0%{?rhel} >= 6 || 0%{?centos} >= 6
 BuildArch:      noarch
@@ -146,10 +140,6 @@ services, and dynamic web gateways.
 Summary:        OpenResty documentation tool, restydoc
 Group:          Development/Tools
 Requires:       perl, perl(Getopt::Std), perl(File::Spec), perl(FindBin), perl(Cwd), perl(File::Temp), perl(Pod::Man), perl(Pod::Text)
-
-# The path location is /usr/local/openresty-voms, therefore I can avoid to handle
-# Conflicts for standard rpm
-# Conflicts:      openresty-doc >= 1.15.8.2
 
 %if (!0%{?rhel} || 0%{?rhel} < 7) && !0%{?fedora}
 Requires:       groff
@@ -181,15 +171,11 @@ services, and dynamic web gateways.
 
 Summary:        OpenResty Package Manager
 Group:          Development/Tools
-Requires:       perl, openresty-voms >= %{version}-%{release}, perl(Digest::MD5)
-Requires:       openresty-voms-doc >= %{version}-%{release}, openresty-voms-resty >= %{version}-%{release}
+Requires:       perl, %{name} >= %{version}-%{release}, perl(Digest::MD5)
+Requires:       %{name}-doc >= %{version}-%{release}, %{name}-resty >= %{version}-%{release}
 Requires:       curl, tar, gzip
 #BuildRequires:  perl(Digest::MD5)
 Requires:       perl(Encode), perl(FindBin), perl(File::Find), perl(File::Path), perl(File::Spec), perl(Cwd), perl(Digest::MD5), perl(File::Copy), perl(File::Temp), perl(Getopt::Long)
-
-# The path location is /usr/local/openresty-voms, therefore I can avoid to handle
-# Conflicts for standard rpm
-# Conflicts:      openresty-opm >= 1.15.8.2
 
 %if 0%{?fedora} >= 10 || 0%{?rhel} >= 6 || 0%{?centos} >= 6
 BuildArch:      noarch
@@ -211,8 +197,7 @@ cd ../..
 ./configure \
     --prefix="%{orprefix}" \
     --with-cc='ccache gcc -fdiagnostics-color=always' \
-    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre_prefix}/include -I%{openssl_prefix}/include" \
-    --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre_prefix}/lib:%{openssl_prefix}/lib" \
+    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC" \
     --with-pcre-jit \
     --without-http_rds_json_module \
     --without-http_rds_csv_module \
@@ -237,12 +222,12 @@ cd ../..
     --with-http_mp4_module \
     --with-http_gunzip_module \
     --with-threads \
+    --with-compat \
     --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
-    --with-dtrace-probes \
     --add-module=%{voms_module_prefix} \
-    %{?_smp_mflags}
+    -j`nproc`
 
-make %{?_smp_mflags}
+make -j`nproc`
 
 
 %install
@@ -258,7 +243,6 @@ ln -sf %{orprefix}/bin/resty %{buildroot}/usr/bin/
 ln -sf %{orprefix}/bin/restydoc %{buildroot}/usr/bin/
 ln -sf %{orprefix}/bin/opm %{buildroot}/usr/bin/
 ln -sf %{orprefix}/nginx/sbin/nginx %{buildroot}/usr/bin/%{name}
-ls -al %{buildroot}/usr/bin
 
 %if 0%{?use_systemd}
 
@@ -283,7 +267,7 @@ rm -rf %{buildroot}
 %post
 
 %if 0%{?use_systemd}
-%systemd_post openresty-voms.service
+%systemd_post %{name}.service
 %else
 %if ! 0%{?suse_version}
 /sbin/chkconfig --add %{name}
@@ -293,7 +277,7 @@ rm -rf %{buildroot}
 
 %preun
 %if 0%{?use_systemd}
-%systemd_preun openresty-voms.service
+%systemd_preun %{name}.service
 %else
 %if ! 0%{?suse_version}
 if [ $1 = 0 ]; then
@@ -306,7 +290,7 @@ fi
 
 %if 0%{?use_systemd}
 %postun
-%systemd_postun_with_restart openresty-voms.service
+%systemd_postun_with_restart %{name}.service
 %endif
 
 
@@ -326,7 +310,6 @@ fi
 %{orprefix}/nginx/html/*
 %{orprefix}/nginx/logs/
 %{orprefix}/nginx/sbin/*
-%{orprefix}/nginx/tapset/*
 %config(noreplace) %{orprefix}/nginx/conf/*
 %{orprefix}/COPYRIGHT
 
@@ -360,6 +343,18 @@ fi
 
 
 %changelog
+* Fri Nov 12 2021 Francesco Giacomini
+- add HTTPG and VOMS support to openresty 1.19.9.1
+* Fri Aug 6 2021 Yichun Zhang (agentzh) 1.19.9.1-1
+- upgraded openresty to 1.19.9.1.
+* Mon May 31 2021 Yichun Zhang (agentzh) 1.19.3.2-1
+- upgraded openresty to 1.19.3.2.
+* Fri Nov 6 2020 Yichun Zhang (agentzh) 1.19.3.1-1
+- upgraded openresty to 1.19.3.1.
+* Mon Jul 13 2020 Yichun Zhang (agentzh) 1.17.8.2-1
+- upgraded openresty to 1.17.8.2.
+* Fri Jul 3 2020 Yichun Zhang (agentzh) 1.17.8.1-1
+- upgraded openresty to 1.17.8.1.
 * Mon Nov 18 2019 Elisabetta Ronchieri 1.15.8.2-7
 - handled rpm package with voms module.
 * Thu Aug 29 2019 Yichun Zhang (agentzh) 1.15.8.2-1

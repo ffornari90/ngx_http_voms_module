@@ -1,5 +1,3 @@
-#image: ${CI_REGISTRY}/storm2/build/ngx-voms-build:master-latest
-image: storm2/ngx-voms-build:latest
 
 stages:
   - build
@@ -8,10 +6,12 @@ stages:
 
 build-rpm:
   stage: build
+  image: centos:7
   script:
     - env | sort
-    - export VOMS_MODULE_HOME=${CI_PROJECT_DIR}
-    - cd rpm && sh make_packaging.sh && cd ..
+    - sh .devcontainer/assets/install-build-deps.sh
+    - yum install -y rpm-build redhat-rpm-config rpmdevtools
+    - cd rpm && sh make_packaging.sh ${CI_PROJECT_DIR} && cd ..
     - mv ${HOME}/rpmbuild ./rpmbuild
   artifacts:
     paths:

@@ -45,14 +45,14 @@ GET /
 --- response_body
 /C=IT/O=IGI/CN=test0
 /C=IT/O=IGI/CN=Test CA
-/test/exp1,/test/exp2,/test/exp3/Role=PIPPO
+/test.vo/exp1,/test.vo/exp2,/test.vo/exp3/Role=PIPPO
 /C=IT/O=IGI/CN=voms.example
 /C=IT/O=IGI/CN=Test CA
 test.vo
 voms.example:15000
-20180101000000Z
-20300101000000Z
+20211110000000Z
+20311231000000Z
 n=nickname v=newland q=test.vo,n=nickname v=giaco q=test.vo
-7B
+01E240
 --- error_code: 200
 
