@@ -23,11 +23,11 @@ RUN echo "include_only=.garr.it,.cern.ch" >> /etc/yum/pluginconf.d/fastestmirror
       yum clean all && \
       rm -rf /var/cache/yum
 
-ADD assets/setup.sh /docker/
-ADD assets/user-setup.sh /docker/
-ADD assets/build-install-openresty.sh /docker/
-ADD --chown=$VSCODE_USER:$VSCODE_USER assets/nginx-httpg_no_delegation.patch /home/$VSCODE_USER/
-ADD --chown=$VSCODE_USER:$VSCODE_USER assets/build-install-ngx-voms.sh /home/$VSCODE_USER/bin/
+COPY assets/setup.sh /docker/
+COPY assets/user-setup.sh /docker/
+COPY assets/build-install-openresty.sh /docker/
+COPY --chown=$VSCODE_USER:$VSCODE_USER assets/nginx-httpg_no_delegation.patch /home/$VSCODE_USER/
+COPY --chown=$VSCODE_USER:$VSCODE_USER assets/build-install-ngx-voms.sh /home/$VSCODE_USER/bin/
 RUN sh /docker/setup.sh
 
 USER $VSCODE_USER
