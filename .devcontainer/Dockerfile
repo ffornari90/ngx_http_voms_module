@@ -13,15 +13,12 @@ ENV VSCODE_USER_UID $VSCODE_USER_UID
 ENV VSCODE_GID=${VSCODE_USER_UID}
 
 COPY assets/provide-user.sh /docker/
-RUN sh /docker/provide-user.sh ${VSCODE_USER} ${VSCODE_USER_UID} ${VSCODE_GID}
 
-RUN echo "include_only=.garr.it,.cern.ch" >> /etc/yum/pluginconf.d/fastestmirror.conf && \
-      yum clean all && \
-      yum install -y hostname epel-release && \
-      yum -y update && \
-      yum -y install which wget tar sudo file && \
-      yum clean all && \
-      rm -rf /var/cache/yum
+RUN yum update -y && \
+    yum install -y hostname epel-release which wget tar sudo file && \
+    sh /docker/provide-user.sh ${VSCODE_USER} ${VSCODE_USER_UID} ${VSCODE_GID} && \
+    yum clean all && \
+    rm -rf /var/cache/yum
 
 COPY assets/setup.sh /docker/
 COPY assets/user-setup.sh /docker/
