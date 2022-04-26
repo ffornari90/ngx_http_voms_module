@@ -13,6 +13,9 @@ ENV VSCODE_USER_UID $VSCODE_USER_UID
 ENV VSCODE_GID=${VSCODE_USER_UID}
 
 COPY assets/provide-user.sh /docker/
+COPY assets/setup.sh /docker/
+COPY assets/user-setup.sh /docker/
+COPY assets/build-install-openresty.sh /docker/
 
 RUN yum update -y && \
     yum install -y hostname epel-release which wget tar sudo file && \
@@ -20,17 +23,14 @@ RUN yum update -y && \
     yum clean all && \
     rm -rf /var/cache/yum
 
-COPY assets/setup.sh /docker/
-COPY assets/user-setup.sh /docker/
-COPY assets/build-install-openresty.sh /docker/
 COPY --chown=$VSCODE_USER:$VSCODE_USER assets/nginx-httpg_no_delegation.patch /home/$VSCODE_USER/
 COPY --chown=$VSCODE_USER:$VSCODE_USER assets/build-install-ngx-voms.sh /home/$VSCODE_USER/bin/
 RUN sh /docker/setup.sh
 
 USER $VSCODE_USER
 
-RUN sh /docker/build-install-openresty.sh \
-    && sh /docker/user-setup.sh
+RUN sh /docker/build-install-openresty.sh && \
+    sh /docker/user-setup.sh
 
 USER root
 
