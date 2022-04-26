@@ -18,23 +18,14 @@ COPY assets/user-setup.sh /docker/
 COPY assets/build-install-openresty.sh /docker/
 
 RUN yum update -y && \
-    yum install -y hostname epel-release which wget tar sudo file && \
+    sh /docker/setup.sh && \
     sh /docker/provide-user.sh ${VSCODE_USER} ${VSCODE_USER_UID} ${VSCODE_GID} && \
-    yum clean all && \
-    rm -rf /var/cache/yum
+    yum clean all && rm -rf /var/cache/yum
 
 COPY --chown=$VSCODE_USER:$VSCODE_USER assets/nginx-httpg_no_delegation.patch /home/$VSCODE_USER/
 COPY --chown=$VSCODE_USER:$VSCODE_USER assets/build-install-ngx-voms.sh /home/$VSCODE_USER/bin/
-RUN sh /docker/setup.sh
 
 USER $VSCODE_USER
 
 RUN sh /docker/build-install-openresty.sh && \
     sh /docker/user-setup.sh
-
-USER root
-
-RUN yum install -y https://repo.ius.io/ius-release-el7.rpm centos-release-scl \
-    && yum install -y git224 devtoolset-10
-
-USER $VSCODE_USER
