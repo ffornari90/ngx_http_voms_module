@@ -8,15 +8,17 @@ set -ex
 yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
 
 yum -y install \
-    hostname \
     epel-release \
+    https://repo.ius.io/ius-release-el7.rpm \
+    centos-release-scl
+
+yum -y install \
+    hostname \
     which \
     wget \
     tar \
     sudo \
-    file
-
-yum -y install \
+    file \
     gcc-c++ \
     GeoIP-devel \
     gd-devel \
@@ -32,10 +34,6 @@ yum -y install \
     voms-devel \
     make \
     patch \
-    less
-
-yum -y install https://repo.ius.io/ius-release-el7.rpm centos-release-scl
-
-yum -y install \
+    less \
     git224 \
     devtoolset-10
