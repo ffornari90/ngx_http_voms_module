@@ -1,7 +1,11 @@
 #!/bin/sh
-set -ex
+
+# Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+# SPDX-License-Identifier: EUPL-1.2
 
 # adapted from https://github.com/openresty/docker-openresty
+
+set -ex
 
 # configuring, building and installing is not strictly necessary, since
 # module development requires to rebuild nginx itself, but it's a good

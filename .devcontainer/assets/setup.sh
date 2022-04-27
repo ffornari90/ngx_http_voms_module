@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+# SPDX-License-Identifier: EUPL-1.2
+
 set -ex
 
 yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
