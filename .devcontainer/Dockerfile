@@ -4,13 +4,13 @@
 FROM centos:7
 
 # Allow customization of build user ID and name
-ARG VSCODE_USER=vscode
-ARG VSCODE_USER_UID=1000
-ARG VSCODE_GID=${VSCODE_USER_UID}
+ARG DEV_USER=vscode
+ARG DEV_USER_UID=1000
+ARG DEV_GID=${DEV_USER_UID}
 
-ENV VSCODE_USER $VSCODE_USER
-ENV VSCODE_USER_UID $VSCODE_USER_UID
-ENV VSCODE_GID=${VSCODE_USER_UID}
+ENV DEV_USER $DEV_USER
+ENV DEV_USER_UID $DEV_USER_UID
+ENV DEV_GID ${DEV_USER_UID}
 
 COPY assets/provide-user.sh /docker/
 COPY assets/setup.sh /docker/
@@ -19,13 +19,13 @@ COPY assets/build-install-openresty.sh /docker/
 
 RUN yum update -y && \
     sh /docker/setup.sh && \
-    sh /docker/provide-user.sh ${VSCODE_USER} ${VSCODE_USER_UID} ${VSCODE_GID} && \
+    sh /docker/provide-user.sh ${DEV_USER} ${DEV_USER_UID} ${DEV_GID} && \
     yum clean all && rm -rf /var/cache/yum
 
-COPY --chown=$VSCODE_USER:$VSCODE_USER assets/nginx-httpg_no_delegation.patch /home/$VSCODE_USER/
-COPY --chown=$VSCODE_USER:$VSCODE_USER assets/build-install-ngx-voms.sh /home/$VSCODE_USER/bin/
+COPY --chown=$DEV_USER:$DEV_USER assets/nginx-httpg_no_delegation.patch /home/$DEV_USER/
+COPY --chown=$DEV_USER:$DEV_USER assets/build-install-ngx-voms.sh /home/$DEV_USER/bin/
 
-USER $VSCODE_USER
+USER $DEV_USER
 
 RUN sh /docker/build-install-openresty.sh && \
     sh /docker/user-setup.sh
