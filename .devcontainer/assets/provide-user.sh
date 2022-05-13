@@ -53,6 +53,24 @@ EOF
 USER_RC_PATH="/home/${USERNAME}"
 
 echo "${CODESPACES_BASH}" >> "${USER_RC_PATH}/.bashrc"
+
+cat << EOF >> "${USER_RC_PATH}/.bashrc"
+if [ -f "\${HOME}/openresty-env" ]; then
+    . \${HOME}/openresty-env
+fi
+
+if [ -d \${HOME}/bin ]; then
+  PATH=\${HOME}/bin:\${PATH}
+fi
+
+if [ -n "\${PS1}" ]; then
+    echo
+    echo "To build and install openresty with the ngx_http_voms_module run 'build-install-ngx-voms.sh'"
+    echo "'nginx-httpg_no_delegation.patch' is needed in the directory where the user runs the script"
+    echo
+fi
+EOF
+
 chown ${USERNAME}:${USERNAME} "${USER_RC_PATH}/.bashrc"
 
 echo "Done!"

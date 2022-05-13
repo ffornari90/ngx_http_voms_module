@@ -14,7 +14,6 @@ ENV DEV_GID ${DEV_USER_UID}
 
 COPY assets/provide-user.sh /docker/
 COPY assets/setup.sh /docker/
-COPY assets/user-setup.sh /docker/
 COPY assets/build-install-openresty.sh /docker/
 
 RUN yum update -y && \
@@ -26,5 +25,4 @@ COPY --chown=$DEV_USER:$DEV_USER assets/build-install-ngx-voms.sh /home/$DEV_USE
 
 USER $DEV_USER
 
-RUN sh /docker/build-install-openresty.sh && \
-    sh /docker/user-setup.sh
+RUN sh /docker/build-install-openresty.sh
