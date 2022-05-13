@@ -19,7 +19,7 @@ RUN yum update -y && \
     sh /docker/provide-user.sh ${DEV_USER} ${DEV_USER_UID} ${DEV_GID} && \
     yum clean all && rm -rf /var/cache/yum
 
-COPY --chown=$DEV_USER:$DEV_USER assets/build-install-ngx-voms.sh /home/$DEV_USER/bin/
+COPY --chown=$DEV_USER:$DEV_USER assets/build-install-openresty-voms.sh /home/$DEV_USER/bin/
 
 USER $DEV_USER
 
