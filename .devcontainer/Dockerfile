@@ -12,15 +12,15 @@ ENV USERNAME $USERNAME
 ENV USER_UID $USER_UID
 ENV USER_GID ${USER_UID}
 
-COPY library-script/* /docker/
+COPY library-script/*.sh /tmp/library-script
 
 RUN yum update -y && \
-    sh /docker/setup.sh && \
-    sh /docker/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
+    sh /tmp/library-script/setup.sh && \
+    sh /tmp/library-script/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
     yum clean all && rm -rf /var/cache/yum
 
 COPY --chown=$USERNAME:$USERNAME assets/build-install-openresty-voms.sh /home/$USERNAME/bin/
 
 USER $USERNAME
 
-RUN sh /docker/build-install-openresty.sh
+RUN sh /tmp/library-script/build-install-openresty.sh
