@@ -12,9 +12,7 @@ ENV DEV_USER $DEV_USER
 ENV DEV_USER_UID $DEV_USER_UID
 ENV DEV_GID ${DEV_USER_UID}
 
-COPY assets/provide-user.sh /docker/
-COPY assets/setup.sh /docker/
-COPY assets/build-install-openresty.sh /docker/
+COPY library-script/* /docker/
 
 RUN yum update -y && \
     sh /docker/setup.sh && \
