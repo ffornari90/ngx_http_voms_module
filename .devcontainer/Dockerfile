@@ -4,23 +4,23 @@
 FROM centos:7
 
 # Allow customization of build user ID and name
-ARG DEV_USER=vscode
-ARG DEV_USER_UID=1000
-ARG DEV_GID=${DEV_USER_UID}
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=${USER_UID}
 
-ENV DEV_USER $DEV_USER
-ENV DEV_USER_UID $DEV_USER_UID
-ENV DEV_GID ${DEV_USER_UID}
+ENV USERNAME $USERNAME
+ENV USER_UID $USER_UID
+ENV USER_GID ${USER_UID}
 
 COPY library-script/* /docker/
 
 RUN yum update -y && \
     sh /docker/setup.sh && \
-    sh /docker/provide-user.sh ${DEV_USER} ${DEV_USER_UID} ${DEV_GID} && \
+    sh /docker/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
     yum clean all && rm -rf /var/cache/yum
 
-COPY --chown=$DEV_USER:$DEV_USER assets/build-install-openresty-voms.sh /home/$DEV_USER/bin/
+COPY --chown=$USERNAME:$USERNAME assets/build-install-openresty-voms.sh /home/$USERNAME/bin/
 
-USER $DEV_USER
+USER $USERNAME
 
 RUN sh /docker/build-install-openresty.sh
