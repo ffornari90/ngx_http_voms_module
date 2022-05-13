@@ -7,4 +7,3 @@ The *library-script* folder contains all the scripts needed for the build of the
  
 The *assets* folder contains all the scripts copied inside the container that could be used for the development:
    * *build-install-openresty-voms.sh* configures, builds and installs openresty-voms
-   * *install-build-deps.sh* is used by the CI to install the packages for the deployment environment

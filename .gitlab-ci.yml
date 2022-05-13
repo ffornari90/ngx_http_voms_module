@@ -9,7 +9,7 @@ build-rpm:
   image: centos:7
   script:
     - env | sort
-    - sh .devcontainer/assets/install-build-deps.sh
+    - sh docker/assets/install-build-deps.sh
     - yum install -y rpm-build redhat-rpm-config rpmdevtools
     - cd rpm && sh make_packaging.sh ${CI_PROJECT_DIR} && cd ..
     - mv ${HOME}/rpmbuild ./rpmbuild
