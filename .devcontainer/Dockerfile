@@ -19,7 +19,7 @@ RUN yum update -y && \
     sh /tmp/library-script/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
     yum clean all && rm -rf /var/cache/yum
 
-COPY --chown=$USERNAME:$USERNAME assets/build-install-openresty-voms.sh /home/$USERNAME/bin/
+COPY --chown=$USERNAME:$USERNAME assets/build-install-openresty-voms.sh /usr/local/bin/
 
 USER $USERNAME
 
