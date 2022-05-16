@@ -16,7 +16,7 @@
 #   continuous integration environment first and then in ${HOME}
 #
 # The script works best (i.e. it is tested) if run within a docker container
-# started from the storm2/ngx_http_voms_module dev container
+# started from the .devcontainer
 
 usage()
 {
