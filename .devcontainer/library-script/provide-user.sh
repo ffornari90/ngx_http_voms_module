@@ -68,6 +68,6 @@ if [ -n "\${PS1}" ]; then
 fi
 EOF
 
-chown ${USERNAME}:${USERNAME} "${USER_RC_PATH}/.bashrc"
+chown ${USERNAME}:${USER_GID} "${USER_RC_PATH}/.bashrc"
 
 echo "Done!"
