@@ -8,10 +8,6 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
 
-ENV USERNAME $USERNAME
-ENV USER_UID $USER_UID
-ENV USER_GID ${USER_UID}
-
 COPY library-script/*.sh /tmp/library-script/
 
 RUN yum update -y && \
