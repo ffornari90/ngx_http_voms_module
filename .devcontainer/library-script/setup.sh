@@ -35,5 +35,5 @@ yum -y install \
     make \
     patch \
     less \
-    git224 \
+    git236 \
     devtoolset-10
