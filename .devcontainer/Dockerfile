@@ -1,8 +1,23 @@
-FROM baltig.infn.it:4567/storm2/build/ngx-voms-build:issue-17-latest
+# Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+# SPDX-License-Identifier: EUPL-1.2
 
-USER root
+FROM centos:7
 
-RUN yum install -y https://repo.ius.io/ius-release-el7.rpm centos-release-scl \
-    && yum install -y git224 devtoolset-10
+# Allow customization of build user ID and name
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=${USER_UID}
 
-USER $BUILD_USER
+COPY library-scripts/*.sh /tmp/library-scripts/
+
+RUN yum update -y && \
+    sh /tmp/library-scripts/provide-CI-deps.sh && \
+    sh /tmp/library-scripts/provide-dev-deps.sh && \
+    sh /tmp/library-scripts/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
+    yum clean all && rm -rf /var/cache/yum
+
+COPY --chown=$USERNAME:$USERNAME assets/build-install-openresty-voms.sh /usr/local/bin/
+
+USER $USERNAME
+
+RUN sh /tmp/library-scripts/build-install-openresty.sh

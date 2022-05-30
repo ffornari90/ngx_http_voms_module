@@ -23,6 +23,6 @@
   // Use 'postCreateCommand' to run commands after the container is created.
   //"postCreateCommand": "sudo debuginfo-install -y voms",
   // Comment out this line to run as root instead.
-  "remoteUser": "build",
+  "remoteUser": "vscode",
   "remoteEnv": {"NGX_HTTP_VOMS_MODULE_ROOT": "${containerWorkspaceFolder}"}
 }
