@@ -8,15 +8,15 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
 
-COPY library-script/*.sh /tmp/library-script/
+COPY library-scripts/*.sh /tmp/library-scripts/
 
 RUN yum update -y && \
-    sh /tmp/library-script/provide-deps.sh && \
-    sh /tmp/library-script/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
+    sh /tmp/library-scripts/provide-deps.sh && \
+    sh /tmp/library-scripts/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
     yum clean all && rm -rf /var/cache/yum
 
 COPY --chown=$USERNAME:$USERNAME assets/build-install-openresty-voms.sh /usr/local/bin/
 
 USER $USERNAME
 
-RUN sh /tmp/library-script/build-install-openresty.sh
+RUN sh /tmp/library-scripts/build-install-openresty.sh
