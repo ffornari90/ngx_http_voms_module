@@ -5,10 +5,7 @@
 
 set -ex
 
-yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
-
 yum -y install \
-    epel-release \
     https://repo.ius.io/ius-release-el7.rpm \
     centos-release-scl
 
@@ -19,21 +16,6 @@ yum -y install \
     tar \
     sudo \
     file \
-    gcc-c++ \
-    GeoIP-devel \
-    gd-devel \
-    gettext \
-    ccache \
-    libxslt-devel \
-    lcov \
-    perl-ExtUtils-Embed \
-    perl-Test-Nginx \
-    perl-Digest-SHA \
-    readline-devel \
-    boost-devel \
-    voms-devel \
-    make \
-    patch \
     less \
     git236 \
     devtoolset-10

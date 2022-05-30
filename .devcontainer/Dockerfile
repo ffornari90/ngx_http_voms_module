@@ -11,7 +11,8 @@ ARG USER_GID=${USER_UID}
 COPY library-scripts/*.sh /tmp/library-scripts/
 
 RUN yum update -y && \
-    sh /tmp/library-scripts/provide-deps.sh && \
+    sh /tmp/library-scripts/provide-CI-deps.sh && \
+    sh /tmp/library-scripts/provide-dev-deps.sh && \
     sh /tmp/library-scripts/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
     yum clean all && rm -rf /var/cache/yum
 
