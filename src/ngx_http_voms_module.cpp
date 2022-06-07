@@ -261,7 +261,7 @@ static MaybeVomsAc retrieve_voms_ac_from_proxy(ngx_http_request_t* r)
 {
   ngx_log_error(NGX_LOG_DEBUG, r->connection->log, 0, "%s", __func__);
 
-  if (!r->http_connection->ssl) {
+  if (!r->main->http_connection->ssl) {
     ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "SSL not enabled");
     return boost::none;
   }
