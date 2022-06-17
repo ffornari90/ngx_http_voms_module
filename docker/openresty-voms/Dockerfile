@@ -7,20 +7,16 @@ FROM centos:7
 ARG USERNAME=nginx
 ARG USER_UID=1001
 
-RUN echo "include_only=.garr.it,.cern.ch" >> /etc/yum/pluginconf.d/fastestmirror.conf && \
-      yum clean all && \
-      yum install -y hostname epel-release && \
-      yum -y update && \
-      yum -y install which wget tar sudo file && \
-      echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-      adduser --uid ${USER_UID} ${USERNAME} && \
-      usermod -a -G root ${USERNAME} && \
-      yum clean all && \
-      rm -rf /var/cache/yum
+COPY library-scripts/*.sh /tmp/library-scripts/
 
-RUN  \
-          yum -y install voms zlib pcre readline gettext && \ 
-          mkdir /pkgs
+RUN yum update -y && \
+    sh /tmp/library-scripts/provide-deps.sh && \
+    && echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+    adduser --uid ${USER_UID} ${USERNAME} && \
+    usermod -a -G root ${USERNAME} && \
+    yum clean all && rm -rf /var/cache/yum
+
+RUN mkdir /pkgs
 
 ADD *.rpm /pkgs/
 
