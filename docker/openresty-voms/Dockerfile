@@ -4,11 +4,8 @@
 FROM centos:7
 
 # Allow customization of nginx user ID and name
-ARG NGINX_USER=nginx
-ARG NGINX_USER_UID=1001
-
-ENV NGINX_USER $NGINX_USER
-ENV NGINX_USER_UID $NGINX_USER_UID
+ARG USERNAME=nginx
+ARG USER_UID=1001
 
 RUN echo "include_only=.garr.it,.cern.ch" >> /etc/yum/pluginconf.d/fastestmirror.conf && \
       yum clean all && \
@@ -16,8 +13,8 @@ RUN echo "include_only=.garr.it,.cern.ch" >> /etc/yum/pluginconf.d/fastestmirror
       yum -y update && \
       yum -y install which wget tar sudo file && \
       echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-      adduser --uid ${NGINX_USER_UID} ${NGINX_USER} && \
-      usermod -a -G root ${NGINX_USER} && \
+      adduser --uid ${USER_UID} ${USERNAME} && \
+      usermod -a -G root ${USERNAME} && \
       yum clean all && \
       rm -rf /var/cache/yum
 
