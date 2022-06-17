@@ -24,14 +24,14 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-File-Temp
 BuildRequires:  ccache, gcc, make, perl, systemtap-sdt-devel
-BuildRequires:  zlib-devel >= 1.2.12-1
-BuildRequires:  openssl111-devel >= 1.1.1n-1
-BuildRequires:  pcre-devel >= 8.45-1
+BuildRequires:  zlib-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pcre-devel
 BuildRequires:  voms-devel
 BuildRequires:  boost-devel
-Requires:       zlib >= 1.2.12-1
-Requires:       openssl111 >= 1.1.1n-1
-Requires:       pcre >= 8.45-1
+Requires:       zlib
+Requires:       openssl
+Requires:       pcre
 Requires:       voms
 
 %if 0%{?suse_version}
