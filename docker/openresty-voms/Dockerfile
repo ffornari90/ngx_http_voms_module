@@ -1,3 +1,6 @@
+# Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+# SPDX-License-Identifier: EUPL-1.2
+
 FROM centos:7
 
 # Allow customization of nginx user ID and name
