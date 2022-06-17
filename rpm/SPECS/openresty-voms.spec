@@ -1,5 +1,5 @@
 Name:           openresty-voms
-Version:        1.19.9.1
+Version:        1.21.4.1
 Release:        1%{?dist}
 Summary:        OpenResty, scalable web platform by extending NGINX with Lua, with HTTPG and VOMS support
 
@@ -24,14 +24,14 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  perl-File-Temp
 BuildRequires:  ccache, gcc, make, perl, systemtap-sdt-devel
-BuildRequires:  zlib-devel
-BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
+BuildRequires:  zlib-devel >= 1.2.12-1
+BuildRequires:  openssl111-devel >= 1.1.1n-1
+BuildRequires:  pcre-devel >= 8.45-1
 BuildRequires:  voms-devel
 BuildRequires:  boost-devel
-Requires:       zlib
-Requires:       openssl
-Requires:       pcre
+Requires:       zlib >= 1.2.12-1
+Requires:       openssl111 >= 1.1.1n-1
+Requires:       pcre >= 8.45-1
 Requires:       voms
 
 %if 0%{?suse_version}
@@ -62,7 +62,9 @@ Requires(preun): chkconfig, initscripts
 AutoReqProv:        no
 
 %define orprefix            %{_usr}/local/%{name}
-
+%define zlib_prefix         %{orprefix}/zlib
+%define pcre_prefix         %{orprefix}/pcre
+%define openssl_prefix      %{orprefix}/openssl111
 
 %description
 This package contains the core server for OpenResty. Built for production
@@ -197,7 +199,8 @@ cd ../..
 ./configure \
     --prefix="%{orprefix}" \
     --with-cc='ccache gcc -fdiagnostics-color=always' \
-    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC" \
+    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre_prefix}/include -I%{openssl_prefix}/include" \
+    --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre_prefix}/lib:%{openssl_prefix}/lib" \
     --with-pcre-jit \
     --without-http_rds_json_module \
     --without-http_rds_csv_module \
@@ -343,6 +346,8 @@ fi
 
 
 %changelog
+* Tue May 17 2022 Yichun Zhang (agentzh) 1.21.4.1-1
+- upgraded openresty to 1.21.4.1.
 * Fri Nov 12 2021 Francesco Giacomini
 - add HTTPG and VOMS support to openresty 1.19.9.1
 * Fri Aug 6 2021 Yichun Zhang (agentzh) 1.19.9.1-1
