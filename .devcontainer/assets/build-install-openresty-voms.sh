@@ -114,15 +114,40 @@ PCRE_PREFIX=/usr
 
 cd ${openresty_root}
 ./configure \
-	--with-cc="ccache gcc -fdiagnostics-color=always" \
-	--with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I${ZLIB_PREFIX}/include -I${PCRE_PREFIX}/include -I${OPENSSL_PREFIX}/include" \
-        --with-ld-opt="-L${ZLIB_PREFIX}/lib -L${PCRE_PREFIX}/lib -L${OPENSSL_PREFIX}/lib -Wl,-rpath,${ZLIB_PREFIX}/lib:${PCRE_PREFIX}/lib:${OPENSSL_PREFIX}/lib" \
-        --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" \
-        ${RESTY_CONFIG_OPTIONS} \
-        ${debug} \
-        --with-cc-opt="${cc1} ${cc2} ${cc3}" \
-         ${ld} \
-        --add-module=${module_root}
+  --prefix=${RESTY_PREFIX} \
+  --with-cc='ccache gcc -fdiagnostics-color=always' \
+  --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre_prefix}/include -I%{openssl_prefix}/include" \
+  --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre_prefix}/lib:%{openssl_prefix}/lib" \
+  --with-pcre-jit \
+  --without-http_rds_json_module \
+  --without-http_rds_csv_module \
+  --without-lua_rds_parser \
+  --with-stream \
+  --with-stream_ssl_module \
+  --with-stream_ssl_preread_module \
+  --with-http_v2_module \
+  --without-mail_pop3_module \
+  --without-mail_imap_module \
+  --without-mail_smtp_module \
+  --with-http_stub_status_module \
+  --with-http_realip_module \
+  --with-http_addition_module \
+  --with-http_auth_request_module \
+  --with-http_secure_link_module \
+  --with-http_random_index_module \
+  --with-http_gzip_static_module \
+  --with-http_sub_module \
+  --with-http_dav_module \
+  --with-http_flv_module \
+  --with-http_mp4_module \
+  --with-http_gunzip_module \
+  --with-threads \
+  --with-compat \
+  --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
+  ${debug} \
+  --with-cc-opt="${cc1} ${cc2} ${cc3}" \
+  ${ld} \
+  --add-module=${module_root}
 
 nginx_version=$(find build -name nginx.h | xargs awk '/define NGINX_VERSION/ {print $3}' | tr -d '"')
 cd build/nginx-${nginx_version}
