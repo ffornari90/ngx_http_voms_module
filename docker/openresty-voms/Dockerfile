@@ -11,7 +11,7 @@ COPY library-scripts/*.sh /tmp/library-scripts/
 
 RUN yum update -y && \
     sh /tmp/library-scripts/provide-deps.sh && \
-    && echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+    echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
     adduser --uid ${USER_UID} ${USERNAME} && \
     usermod -a -G root ${USERNAME} && \
     yum clean all && rm -rf /var/cache/yum
