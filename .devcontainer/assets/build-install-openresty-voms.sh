@@ -102,8 +102,8 @@ if [ ! -d "${module_root}" ]; then
     exit 1
 fi
 
-if [ ! -f "./nginx-httpg_no_delegation.patch" ]; then
-    >&2 echo 'nginx-httpg_no_delegation.patch not found in current dir.'
+if [ ! -f "/workspaces/ngx_http_voms_module/nginx-httpg_no_delegation.patch" ]; then
+    >&2 echo "nginx-httpg_no_delegation.patch not found in ${module_root} dir."
     exit 1
 fi
 
@@ -151,7 +151,7 @@ cd ${openresty_root}
 
 nginx_version=$(find build -name nginx.h | xargs awk '/define NGINX_VERSION/ {print $3}' | tr -d '"')
 cd build/nginx-${nginx_version}
-patch -p1 < nginx-httpg_no_delegation.patch
+patch -p1 < ${module_root}/nginx-httpg_no_delegation.patch
 cd -
 
 make -j $(nproc)
