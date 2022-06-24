@@ -18,6 +18,8 @@
 # The script works best (i.e. it is tested) if run within a docker container
 # started from the .devcontainer
 
+set -ex
+
 usage()
 {
     echo "USAGE: $0 [OPTIONS] [TEXT]"
@@ -102,7 +104,7 @@ if [ ! -d "${module_root}" ]; then
     exit 1
 fi
 
-if [ ! -f "/workspaces/ngx_http_voms_module/nginx-httpg_no_delegation.patch" ]; then
+if [ ! -f "${module_root}/nginx-httpg_no_delegation.patch" ]; then
     >&2 echo "nginx-httpg_no_delegation.patch not found in ${module_root} dir."
     exit 1
 fi
