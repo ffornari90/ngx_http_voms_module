@@ -22,7 +22,7 @@ usage()
 {
     echo "USAGE: $0 [OPTIONS] [TEXT]"
     echo ""
-    echo "The default optimization level is -O3"
+    echo "The default optimization level is -O2"
     echo ""
     echo "OPTIONS"
     echo ""
@@ -33,14 +33,9 @@ usage()
     echo ""
 }
 
-#The script at the moment allows only debug builds, i.e. "-O0". This option is kept in shell variables cc2, but there is no way to set it to something else. I propose that by default it is set to -O2 (or even -O3) and is set to -O0 only if the option --debug is passed to the script. Moreover --coverage should imply --debug.
-
-
-cc1=-g
 debug=""
 cc3=""
 cc2=-O2
-ld=""
 
 while [ "$1" != "" ]; do
   option=`echo $1 | awk -F= '{print $1}'`
@@ -57,30 +52,19 @@ while [ "$1" != "" ]; do
       ;;
     -c|--coverage)
       cc3=--coverage
-      ld='--with-ld-opt=--coverage'
-      echo Enabled the coverage options $cc3 $ld
+      echo Enabled the coverage options $cc3
       ;;
     -h|--help)
       usage
       exit
       ;;
     *)
-      debug=""
-      cc3=""
-      cc2=-O2
-      ld=""
+      echo Error: option $1 unrecognized
+      exit 1
       ;;
   esac
   shift
 done
-
-if [ ! -z "${cc3}" ]; then
-    if [ -z "${debug}" ]; then
-        debug="--with-debug"
-        cc2=-O0
-        echo Enabled the debug option $debug and the optimization level $cc2
-    fi
-fi
 
 if [ -f "${HOME}/openresty-env" ]; then
     . ${HOME}/openresty-env
@@ -116,8 +100,9 @@ cd ${openresty_root}
 ./configure \
   --prefix=${RESTY_PREFIX} \
   --with-cc='ccache gcc -fdiagnostics-color=always' \
-  --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre_prefix}/include -I%{openssl_prefix}/include" \
-  --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre_prefix}/lib:%{openssl_prefix}/lib" \
+  ${debug} \
+  --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{ZLIB_PREFIX}/include -I%{PCRE_PREFIX}/include -I%{OPENSSL_PREFIX}/include -g ${cc2} ${cc3}" \
+  --with-ld-opt="-L%{ZLIB_PREFIX}/lib -L%{PCRE_PREFIX}/lib -L%{OPENSSL_PREFIX}/lib -Wl,-rpath,%{ZLIB_PREFIX}/lib:%{PCRE_PREFIX}/lib:%{OPENSSL_PREFIX}/lib ${cc3}" \
   --with-pcre-jit \
   --without-http_rds_json_module \
   --without-http_rds_csv_module \
@@ -142,11 +127,9 @@ cd ${openresty_root}
   --with-http_mp4_module \
   --with-http_gunzip_module \
   --with-threads \
+  --with-poll_module \
   --with-compat \
-  --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
-  ${debug} \
-  --with-cc-opt="${cc1} ${cc2} ${cc3}" \
-  ${ld} \
+  --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT -g ${cc2}" \
   --add-module=${module_root}
 
 nginx_version=$(find build -name nginx.h | xargs awk '/define NGINX_VERSION/ {print $3}' | tr -d '"')
