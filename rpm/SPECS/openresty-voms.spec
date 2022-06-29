@@ -64,7 +64,7 @@ AutoReqProv:        no
 %define orprefix            %{_usr}/local/%{name}
 %define zlib_prefix         %{orprefix}/zlib
 %define pcre_prefix         %{orprefix}/pcre
-%define openssl_prefix      %{orprefix}/openssl111
+%define openssl_prefix      %{orprefix}/openssl
 
 %description
 This package contains the core server for OpenResty. Built for production
