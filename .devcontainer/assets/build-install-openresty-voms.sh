@@ -103,8 +103,8 @@ cd ${openresty_root}
   --prefix=${RESTY_PREFIX} \
   --with-cc='ccache gcc -fdiagnostics-color=always' \
   ${debug} \
---with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{ZLIB_PREFIX}/include -I%{PCRE_PREFIX}/include -I%{OPENSSL_PREFIX}/include -g ${cc2} ${cc3}" \
-  --with-ld-opt="-L%{ZLIB_PREFIX}/lib -L%{PCRE_PREFIX}/lib -L%{OPENSSL_PREFIX}/lib -Wl,-rpath,%{ZLIB_PREFIX}/lib:%{PCRE_PREFIX}/lib:%{OPENSSL_PREFIX}/lib ${cc3}" \
+  --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -g ${cc2} ${cc3}" \
+  --with-ld-opt="${cc3}" \
   ${RESTY_CONFIG_OPTIONS} \
   --with-poll_module \
   --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT -g ${cc2}" \
