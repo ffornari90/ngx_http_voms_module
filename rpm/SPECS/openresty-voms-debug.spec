@@ -1,7 +1,7 @@
 Name:           openresty-voms
-Version:        1.19.9.1
+Version:        1.21.4.1
 Release:        1%{?dist}
-Summary:        OpenResty, scalable web platform by extending NGINX with Lua, with HTTPG and VOMS support
+Summary:        OpenResty, scalable web platform by extending NGINX with Lua, with HTTPG and VOMS support - Debug version
 
 Group:          System Environment/Daemons
 
@@ -62,11 +62,13 @@ Requires(preun): chkconfig, initscripts
 AutoReqProv:        no
 
 %define orprefix            %{_usr}/local/%{name}
-
+%define openssl_prefix      %{orprefix}/openssl
+%define zlib_prefix         %{orprefix}/zlib
+%define pcre_prefix         %{orprefix}/pcre
 
 %description
-This package contains the core server for OpenResty. Built for production
-uses.
+This package contains the debug version of the core server for OpenResty.
+Built for development purposes only.
 
 OpenResty is a full-fledged web platform by integrating the standard Nginx
 core, LuaJIT, many carefully written Lua libraries, lots of high quality
@@ -198,7 +200,8 @@ cd ../..
     --prefix="%{orprefix}" \
     --with-cc='ccache gcc -fdiagnostics-color=always' \
     --with-debug \
-    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -Og" \
+    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre_prefix}/include -I%{openssl_prefix}/include -Og" \
+    --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre_prefix}/lib:%{openssl_prefix}/lib" \
     --with-pcre-jit \
     --without-http_rds_json_module \
     --without-http_rds_csv_module \
@@ -223,8 +226,9 @@ cd ../..
     --with-http_mp4_module \
     --with-http_gunzip_module \
     --with-threads \
+    --with-poll_module \
     --with-compat \
-    --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
+    --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT -O0' \
     --add-module=%{voms_module_prefix} \
     -j`nproc`
 
@@ -344,6 +348,8 @@ fi
 
 
 %changelog
+* Tue May 17 2022 Yichun Zhang (agentzh) 1.21.4.1-1
+- upgraded openresty to 1.21.4.1.
 * Fri Nov 12 2021 Francesco Giacomini
 - add HTTPG and VOMS support to openresty 1.19.9.1
 * Fri Aug 6 2021 Yichun Zhang (agentzh) 1.19.9.1-1
