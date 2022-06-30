@@ -16,16 +16,7 @@ set -ex
 # Docker Build Arguments
 RESTY_VERSION=${RESTY_VERSION:-"1.21.4.1"}
 RESTY_PREFIX=${HOME}/local/openresty
-
-cd
-wget --quiet https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz
-tar zxf openresty-${RESTY_VERSION}.tar.gz
-cd openresty-${RESTY_VERSION}
-./configure \
-    --prefix=${RESTY_PREFIX} \
-    --with-cc='ccache gcc -fdiagnostics-color=always' \
-    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre_prefix}/include -I%{openssl_prefix}/include" \
-    --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre_prefix}/lib:%{openssl_prefix}/lib" \
+RESTY_CONFIG_OPTIONS="\
     --with-pcre-jit \
     --without-http_rds_json_module \
     --without-http_rds_csv_module \
@@ -50,7 +41,18 @@ cd openresty-${RESTY_VERSION}
     --with-http_mp4_module \
     --with-http_gunzip_module \
     --with-threads \
-    --with-compat \
+    --with-compat "
+
+cd
+wget --quiet https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz
+tar zxf openresty-${RESTY_VERSION}.tar.gz
+cd openresty-${RESTY_VERSION}
+./configure \
+    --prefix=${RESTY_PREFIX} \
+    --with-cc='ccache gcc -fdiagnostics-color=always' \
+    --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -I%{zlib_prefix}/include -I%{pcre_prefix}/include -I%{openssl_prefix}/include" \
+    --with-ld-opt="-L%{zlib_prefix}/lib -L%{pcre_prefix}/lib -L%{openssl_prefix}/lib -Wl,-rpath,%{zlib_prefix}/lib:%{pcre_prefix}/lib:%{openssl_prefix}/lib" \
+    ${RESTY_CONFIG_OPTIONS} \
     --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT'
 make
 make install
