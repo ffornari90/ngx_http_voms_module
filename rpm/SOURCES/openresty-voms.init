@@ -1,7 +1,10 @@
-#!/bin/sh
-#
+#!/usr/bin/env bash
+
+# Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+# SPDX-License-Identifier: EUPL-1.2
+
 # openresty-voms - this script starts and stops the nginx daemon of OpenResty
-#
+
 # chkconfig:   345 85 15
 # description: OpenResty is a scalable web platform by extending
 #              NGINX with Lua
