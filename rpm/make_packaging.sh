@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+# SPDX-License-Identifier: EUPL-1.2
 
 voms_module_prefix=${HOME}/ngx_http_voms_module
 if [ $# -eq 1 ]; then
