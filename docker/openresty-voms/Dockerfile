@@ -26,7 +26,7 @@ COPY assets/nginx.conf /usr/local/openresty-voms/nginx/conf/nginx.conf
 
 CMD ["/usr/bin/openresty-voms", "-g", "daemon off;"]
 
-ENV TINI_VERSION v0.18.0
+ENV TINI_VERSION v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
