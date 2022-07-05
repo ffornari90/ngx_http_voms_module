@@ -41,18 +41,18 @@ RESTY_CONFIG_OPTIONS="\
     --with-http_mp4_module \
     --with-http_gunzip_module \
     --with-threads \
-    --with-compat "
+    --with-compat \
+    --prefix=${RESTY_PREFIX} "
 
 cd
 wget --quiet https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz
 tar zxf openresty-${RESTY_VERSION}.tar.gz
 cd openresty-${RESTY_VERSION}
 ./configure \
-    --prefix=${RESTY_PREFIX} \
     --with-cc='ccache gcc -fdiagnostics-color=always' \
     --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC" \
-    ${RESTY_CONFIG_OPTIONS} \
-    --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT'
+    --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
+    ${RESTY_CONFIG_OPTIONS}
 make
 make install
 

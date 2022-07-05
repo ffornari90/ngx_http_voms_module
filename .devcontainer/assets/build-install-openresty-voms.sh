@@ -43,12 +43,12 @@ while [ "$1" != "" ]; do
   option=`echo $1 | awk -F= '{print $1}'`
   case $option in
     -o|--opt-log)
-      debug='--with-debug'
+      debug='--with-debug --with-poll_module'
       cc2=-O2
       echo Enabled the debug option $debug and the optimization level $cc2
       ;;
     -d|--debug)
-      debug='--with-debug'
+      debug='--with-debug --with-poll_module'
       cc2=-O0
       echo Enabled the debug option $debug and the optimization level $cc2
       ;;
@@ -100,14 +100,11 @@ PCRE_PREFIX=/usr
 
 cd ${openresty_root}
 ./configure \
-  --prefix=${RESTY_PREFIX} \
   --with-cc='ccache gcc -fdiagnostics-color=always' \
-  ${debug} \
   --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -g ${cc2} ${cc3}" \
-  --with-ld-opt="${cc3}" \
+  --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" \
   ${RESTY_CONFIG_OPTIONS} \
-  --with-poll_module \
-  --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT -g ${cc2}" \
+  ${debug} \
   --add-module=${module_root}
 
 nginx_version=$(find build -name nginx.h | xargs awk '/define NGINX_VERSION/ {print $3}' | tr -d '"')
