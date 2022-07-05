@@ -18,7 +18,7 @@
 # The script works best (i.e. it is tested) if run within a docker container
 # started from the .devcontainer
 
-set -ex
+set -e
 
 usage()
 {
@@ -38,6 +38,7 @@ usage()
 debug=""
 cc3=""
 cc2=-O2
+ld=""
 
 while [ "$1" != "" ]; do
   option=`echo $1 | awk -F= '{print $1}'`
@@ -54,6 +55,7 @@ while [ "$1" != "" ]; do
       ;;
     -c|--coverage)
       cc3=--coverage
+      ld='--with-ld-opt=--coverage'
       echo Enabled the coverage options $cc3
       ;;
     -h|--help)
@@ -105,6 +107,7 @@ cd ${openresty_root}
   --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" \
   ${RESTY_CONFIG_OPTIONS} \
   ${debug} \
+  ${ld} \
   --add-module=${module_root}
 
 nginx_version=$(find build -name nginx.h | xargs awk '/define NGINX_VERSION/ {print $3}' | tr -d '"')
