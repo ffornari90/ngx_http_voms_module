@@ -17,41 +17,42 @@ set -ex
 RESTY_VERSION=${RESTY_VERSION:-"1.21.4.1"}
 RESTY_PREFIX=${HOME}/local/openresty
 RESTY_CONFIG_OPTIONS="\
-    --with-pcre-jit \
-    --without-http_rds_json_module \
+    --with-compat \
+    --with-http_addition_module \
+    --with-http_auth_request_module \
+    --with-http_dav_module \
+    --with-http_flv_module \
+    --with-http_gunzip_module \
+    --with-http_gzip_static_module \
+    --with-http_mp4_module \
+    --with-http_random_index_module \
+    --with-http_realip_module \
+    --with-http_secure_link_module \
+    --with-http_stub_status_module \
+    --with-http_sub_module \
+    --with-http_v2_module \
     --without-http_rds_csv_module \
+    --without-http_rds_json_module \
     --without-lua_rds_parser \
+    --without-mail_imap_module \
+    --without-mail_pop3_module \
+    --without-mail_smtp_module \
+    --with-pcre-jit \
     --with-stream \
     --with-stream_ssl_module \
     --with-stream_ssl_preread_module \
-    --with-http_v2_module \
-    --without-mail_pop3_module \
-    --without-mail_imap_module \
-    --without-mail_smtp_module \
-    --with-http_stub_status_module \
-    --with-http_realip_module \
-    --with-http_addition_module \
-    --with-http_auth_request_module \
-    --with-http_secure_link_module \
-    --with-http_random_index_module \
-    --with-http_gzip_static_module \
-    --with-http_sub_module \
-    --with-http_dav_module \
-    --with-http_flv_module \
-    --with-http_mp4_module \
-    --with-http_gunzip_module \
     --with-threads \
-    --with-compat \
-    --prefix=${RESTY_PREFIX} "
+    --prefix=${RESTY_PREFIX} \
+    "
 
 cd
 wget --quiet https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz
 tar zxf openresty-${RESTY_VERSION}.tar.gz
 cd openresty-${RESTY_VERSION}
 ./configure \
-    --with-cc='ccache gcc -fdiagnostics-color=always' \
+    --with-cc="ccache gcc -fdiagnostics-color=always" \
     --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC" \
-    --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
+    --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" \
     ${RESTY_CONFIG_OPTIONS}
 make
 make install
