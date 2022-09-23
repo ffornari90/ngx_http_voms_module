@@ -22,41 +22,38 @@ set -e
 
 usage()
 {
-    echo "USAGE: $0 [OPTIONS] [TEXT]"
-    echo ""
-    echo "The default optimization level is -O2"
-    echo ""
-    echo "OPTIONS"
-    echo ""
+    echo "Usage: $0 [OPTIONS]"
+    echo
+    echo "The default compilation options are '-g -O2'"
+    echo
+    echo "OPTIONS:"
+    echo
     echo "-h|--help"
-    echo "-o|--opt-log to enable the --with-debug option and the optimization level -O2"
-    echo "-d|--debug to enable the --with-debug option and the optimization level -O0"
-    echo "-c|--coverage to add the --coverage option to the --with-{ld|cc}-opt option and enable the debug options"
-    echo ""
+    echo "--optimize - compile in optimized mode"
+    echo "--debug - compile in debug mode"
+    echo "--coverage - compile in debug mode and enable coverage"
+    echo "--enable-debug-log - enable nginx debug log"
+    echo
 }
 
-debug=""
-cc3=""
-cc2=-O2
-ld=""
+debug=
+cflags="-g -O2"
+ldflags=
 
 while [ "$1" != "" ]; do
-  option=`echo $1 | awk -F= '{print $1}'`
-  case $option in
-    -o|--opt-log)
-      debug='--with-debug --with-poll_module'
-      cc2=-O2
-      echo Enabled the debug option $debug and the optimization level $cc2
+  case $1 in
+    --enable-debug-log)
+      debug="--with-debug --with-poll_module"
       ;;
-    -d|--debug)
-      debug='--with-debug --with-poll_module'
-      cc2=-O0
-      echo Enabled the debug option $debug and the optimization level $cc2
+    --optimize)
+      cflags="$cflags -O3 -DNDEBUG"
       ;;
-    -c|--coverage)
-      cc3=--coverage
-      ld='--with-ld-opt=--coverage'
-      echo Enabled the coverage options $cc3
+    --debug)
+      cflags="$cflags -O0"
+      ;;
+    --coverage)
+      cflags="$cflags -O0 --coverage"
+      ldflags="--coverage"
       ;;
     -h|--help)
       usage
@@ -95,19 +92,14 @@ if [ ! -f "${module_root}/nginx-httpg_no_delegation.patch" ]; then
     exit 1
 fi
 
-RESTY_PACKAGES_PREFIX=/usr/local/openresty
-ZLIB_PREFIX=/usr
-OPENSSL_PREFIX=/usr
-PCRE_PREFIX=/usr
-
 cd ${openresty_root}
 ./configure \
-  --with-cc='ccache gcc -fdiagnostics-color=always' \
-  --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -g ${cc2} ${cc3}" \
+  --with-cc="ccache gcc -fdiagnostics-color=always" \
+  --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC ${cflags}" \
+  --with-ld-opt="${ldflags}" \
   --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" \
   ${RESTY_CONFIG_OPTIONS} \
   ${debug} \
-  ${ld} \
   --add-module=${module_root}
 
 nginx_version=$(find build -name nginx.h | xargs awk '/define NGINX_VERSION/ {print $3}' | tr -d '"')
