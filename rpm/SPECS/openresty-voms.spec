@@ -342,6 +342,8 @@ fi
 
 
 %changelog
+* Fri Sep 23 2022 Laura Cappelli
+- add HTTPG and VOMS support to openresty 1.21.4.1-1
 * Tue May 17 2022 Yichun Zhang (agentzh) 1.21.4.1-1
 - upgraded openresty to 1.21.4.1.
 * Fri Nov 12 2021 Francesco Giacomini
