@@ -6,9 +6,6 @@ run_tests();
 __DATA__
 
 === TEST 1: https with x509 client authentication, expired client certificate
---- main_config
-    load_module /etc/nginx/modules/ngx_http_echo_module.so;
-    load_module /etc/nginx/modules/ngx_http_voms_module.so;
 --- http_config
     server {
         error_log logs/error.log debug;
