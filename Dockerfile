@@ -24,3 +24,10 @@ RUN sh /tmp/library-scripts/provide-nginx-with-httpg.sh
 COPY ngx-http-voms-module /ngx-http-voms-module
 COPY t /home/nginx/t
 RUN sh /tmp/library-scripts/provide-ngx-http-voms-module.sh
+
+CMD ["nginx"]
+
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
