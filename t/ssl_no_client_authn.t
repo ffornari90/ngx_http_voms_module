@@ -7,6 +7,8 @@ __DATA__
 
 === TEST 1: HTTPS with no X.509 client authentication
 --- main_config
+    load_module /etc/nginx/modules/ngx_http_echo_module.so;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
     env X509_VOMS_DIR=t/vomsdir;
 --- http_config
     server {

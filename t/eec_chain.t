@@ -6,6 +6,8 @@ __DATA__
 
 === TEST 1: EEC chain containing CA certificate
 --- main_config
+    load_module /etc/nginx/modules/ngx_http_echo_module.so;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
 --- http_config
