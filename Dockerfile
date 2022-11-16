@@ -15,12 +15,11 @@ RUN yum update -y && \
    sh /tmp/library-scripts/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
    yum clean all && rm -rf /var/cache/yum
 
-# install nginx with patch for HTTPG
-COPY sources/nginx-httpg_no_delegation.patch /tmp/sources/
-COPY sources/nginx.spec /tmp/sources/
-RUN sh /tmp/library-scripts/provide-nginx-with-httpg.sh
-
-# copy and install nginx_http_voms module 
+# install nginx with patch for HTTPG and voms module
 COPY ngx-http-voms-module /ngx-http-voms-module
+COPY sources/* /tmp/sources/
+RUN sh /tmp/library-scripts/provide-ngx-httpg-voms.sh
+
+# import test 
 COPY t /home/nginx/t
-RUN sh /tmp/library-scripts/provide-ngx-http-voms-module.sh
+COPY test-ngx-voms.sh /home/nginx/

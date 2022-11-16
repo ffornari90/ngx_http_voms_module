@@ -18,7 +18,12 @@ cd ~/rpmbuild/SOURCES/
 wget http://nginx.org/packages/centos/7/SRPMS/nginx-$ngxVersion-1.el7.ngx.src.rpm
 rpm2cpio nginx-$ngxVersion-1.el7.ngx.src.rpm | cpio -idm
 
-# use nginx spec file with the httpg patch
+# set modules
+wget -O ./ngx-http-echo-module.tar.gz https://github.com/openresty/echo-nginx-module/archive/refs/tags/v0.63.tar.gz
+tar xzf ngx-http-echo-module.tar.gz
+mv /ngx-http-voms-module .
+
+# use nginx spec file with the httpg patch and static modules
 cp /tmp/sources/nginx-httpg_no_delegation.patch ${HOME}/rpmbuild/SOURCES/
 cp /tmp/sources/nginx.spec ~/rpmbuild/SPECS
 
