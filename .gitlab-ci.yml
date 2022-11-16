@@ -16,4 +16,4 @@ upload-container:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
     - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
-    # - build-docker-image.sh && push-docker-image.sh
+    - build-docker-image.sh && push-docker-image.sh
