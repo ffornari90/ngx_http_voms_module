@@ -18,8 +18,10 @@ RUN yum update -y && \
 # install nginx with patch for HTTPG and voms module
 COPY ngx-http-voms-module /ngx-http-voms-module
 COPY sources/* /tmp/sources/
+USER nginx
 RUN sh /tmp/library-scripts/provide-ngx-httpg-voms.sh
 
 # import test 
 COPY t /home/nginx/t
 COPY test-ngx-voms.sh /home/nginx/
+RUN sudo chown -R nginx:nginx /home/nginx/

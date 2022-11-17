@@ -21,7 +21,7 @@ rpm2cpio nginx-$ngxVersion-1.el7.ngx.src.rpm | cpio -idm
 # set modules
 wget -O ./ngx-http-echo-module.tar.gz https://github.com/openresty/echo-nginx-module/archive/refs/tags/v0.63.tar.gz
 tar xzf ngx-http-echo-module.tar.gz
-mv /ngx-http-voms-module .
+sudo mv /ngx-http-voms-module .
 
 # use nginx spec file with the httpg patch and static modules
 cp /tmp/sources/nginx-httpg_no_delegation.patch ${HOME}/rpmbuild/SOURCES/
@@ -32,3 +32,7 @@ rpmlint ~/rpmbuild/SPECS/nginx.spec
 rpmbuild -ba ~/rpmbuild/SPECS/nginx.spec
 sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/nginx-$ngxVersion-1.el7.ngx.x86_64.rpm
 nginx -v
+
+sudo chown -R nginx:nginx /var/cache/nginx
+sudo chown -R nginx:nginx /var/log/nginx  
+sudo chown -R nginx:nginx /etc/nginx/
