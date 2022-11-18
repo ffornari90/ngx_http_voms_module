@@ -29,8 +29,3 @@ RUN rpm -ivh /pkgs/nginx-1.22.1-1.el7.ngx.x86_64.rpm && \
 # install njs and voms dynamic modules
 # RUN yum install -y nginx-module-njs && \
 #     rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
-
-# import test 
-COPY t /home/nginx/t
-COPY test-ngx-voms.sh /home/nginx/
-RUN sudo chown -R nginx:nginx /home/nginx/

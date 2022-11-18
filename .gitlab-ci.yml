@@ -1,36 +1,26 @@
 
 stages:
-  - build-ngx
+  - build-rpm
   - build-voms
   - docker-build-ngx
 
-build-ngx-httpg-rpm:
-  stage: build-ngx
+build-all-rpm:
+  stage: build-rpm
   image: centos:7
   script: 
     - env | sort
     - sh docker/library-scripts/provide-deps.sh
     - sh rpm/build-httpg-nginx-rpm.sh
-    - cd ${CI_PROJECT_DIR} && mkdir ngx-artifacts
-    - cp ~/rpmbuild/SRPMS/* ngx-artifacts/
-    - cp ~/rpmbuild/RPMS/x86_64/* ngx-artifacts/
-  artifacts:
-    paths:
-      - ngx-artifacts/
-
-build-voms-rpm:
-  stage: build-voms
-  image: centos:7
-  script:
-    - env | sort
-    - sh docker/library-scripts/provide-deps.sh
+    - cd ${CI_PROJECT_DIR} && mkdir artifacts
+    - cp ~/rpmbuild/SRPMS/* artifacts/ 
+    - cp ~/rpmbuild/RPMS/x86_64/* artifacts/
+    - rm -rf ~/rpmbuild/
     - sh rpm/build-voms-rpm.sh
-    - cd ${CI_PROJECT_DIR} && mkdir voms-artifacts
-    - cp ~/rpmbuild/SRPMS/* voms-artifacts/
-    - cp ~/rpmbuild/RPMS/x86_64/* voms-artifacts/
+    - cp ~/rpmbuild/SRPMS/* artifacts/
+    - cp ~/rpmbuild/RPMS/x86_64/* vartifacts/
   artifacts:
     paths:
-      - voms-artifacts/
+      - artifacts/
 
 build-ngx-httpg-container:
   stage: docker-build-ngx
@@ -39,8 +29,7 @@ build-ngx-httpg-container:
     - name: docker:dind
       command: ["--tls=false"]
   dependencies:
-    - build-ngx-httpg-rpm
-    - build-voms-rpm
+    - build-all-rpm
   script:
     - apk add git bash
     - git clone https://baltig.infn.it/mw-devel/helper-scripts.git helper-scripts
