@@ -17,7 +17,7 @@ build-all-rpm:
     - rm -rf ~/rpmbuild/
     - sh rpm/build-voms-rpm.sh
     - cp ~/rpmbuild/SRPMS/* artifacts/
-    - cp ~/rpmbuild/RPMS/x86_64/* vartifacts/
+    - cp ~/rpmbuild/RPMS/x86_64/* artifacts/
   artifacts:
     paths:
       - artifacts/
