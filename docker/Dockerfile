@@ -13,13 +13,12 @@ COPY library-scripts/*.sh /tmp/library-scripts/
 RUN yum update -y && \
     sh /tmp/library-scripts/provide-deps.sh && \
     sh /tmp/library-scripts/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
+    mkdir /pkgs && \
     yum clean all && rm -rf /var/cache/yum
 
 # install nginx with patch for HTTPG and voms module
-COPY ngx-http-voms-module /ngx-http-voms-module
-COPY sources/* /tmp/sources/
-USER nginx
-RUN sh /tmp/library-scripts/provide-ngx-httpg-voms.sh
+COPY ngx-artifacts/*.rpm /pkgs/
+COPY voms-artifacts/*.rpm /pkgs/
 
 # import test 
 COPY t /home/nginx/t
