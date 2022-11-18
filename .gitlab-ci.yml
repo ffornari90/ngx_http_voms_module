@@ -9,7 +9,7 @@ build-ngx-httpg-rpm:
   image: centos:7
   script: 
     - env | sort
-    - cd && sh docker/library-scripts/provide-deps.sh
+    - sh docker/library-scripts/provide-deps.sh
     - sh rpm/build-httpg-nginx-rpm.sh
     - mkdir ngx-artifacts
     - cp rpmbuild/SRPMS/* ngx-artifacts/
@@ -23,7 +23,7 @@ build-voms-rpm:
   image: centos:7
   script:
     - env | sort
-    - cd && sh docker/library-scripts/provide-deps.sh
+    - sh docker/library-scripts/provide-deps.sh
     - sh rpm/build-voms-rpm.sh
     - mkdir voms-artifacts
     - cp rpmbuild/SRPMS/* voms-artifacts/
