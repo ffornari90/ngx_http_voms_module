@@ -21,10 +21,10 @@ tar xzf ngx-http-echo-module.tar.gz
 
 # set voms modules sources
 mkdir ngx-http-voms-module
-cp ~/config ngx-http-voms-module/
-cp ~/config.make ngx-http-voms-module/
-cp -r ~/src ngx-http-voms-module/
-cp ~/rpm/nginx-module-http-voms.spec ~/rpmbuild/SPECS
+cp ${CI_PROJECT_DIR}/config ngx-http-voms-module/
+cp ${CI_PROJECT_DIR}/config.make ngx-http-voms-module/
+cp -r ${CI_PROJECT_DIR}/src ngx-http-voms-module/
+cp ${CI_PROJECT_DIR}/rpm/nginx-module-http-voms.spec ~/rpmbuild/SPECS
 
 # build and install rpm
 rpmlint ~/rpmbuild/SPECS/nginx-module-http-voms.spec

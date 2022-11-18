@@ -19,8 +19,8 @@ wget http://nginx.org/packages/centos/7/SRPMS/nginx-$ngxVersion-1.el7.ngx.src.rp
 rpm2cpio nginx-$ngxVersion-1.el7.ngx.src.rpm | cpio -idm
 
 # set the nginx spec file with the httpg patch
-cp ~/nginx-httpg_no_delegation.patch ${HOME}/rpmbuild/SOURCES/
-cp ~/rpm/nginx.spec ~/rpmbuild/SPECS
+cp ${CI_PROJECT_DIR}/nginx-httpg_no_delegation.patch ${HOME}/rpmbuild/SOURCES/
+cp ${CI_PROJECT_DIR}/rpm/nginx.spec ~/rpmbuild/SPECS
 
 # build rpm
 rpmlint ~/rpmbuild/SPECS/nginx.spec

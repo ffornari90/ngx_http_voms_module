@@ -10,6 +10,7 @@ build-ngx-httpg-rpm:
   script: 
     - env | sort
     - sh docker/library-scripts/provide-deps.sh
+    - pwd && echo ${CI_PROJECT_DIR}
     - sh rpm/build-httpg-nginx-rpm.sh
     - mkdir ngx-artifacts
     - cp rpmbuild/SRPMS/* ngx-artifacts/
