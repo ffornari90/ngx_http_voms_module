@@ -19,15 +19,16 @@ RUN yum update -y && \
 COPY *.rpm /pkgs/
 
 # CASE 1 (install nginx httpg)
-RUN rpm -ivh /pkgs/nginx-1.22.1-1.el7.ngx.x86_64.rpm
+RUN rpm -ivh /pkgs/nginx-1.22.1-1.el7.ngx.x86_64.rpm && \
+    rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
 
 # CASE 2 (install nginx stable)
 # COPY nginx.repo /etc/yum.repos.d/nginx.repo
 # RUN yum -y install nginx
 
 # install njs and voms dynamic modules
-RUN yum install -y nginx-module-njs && \
-    rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
+# RUN yum install -y nginx-module-njs && \
+#     rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
 
 # import test 
 COPY t /home/nginx/t
