@@ -1,3 +1,4 @@
 .vscode
 servroot*
 nginx
+docker/artifacts
