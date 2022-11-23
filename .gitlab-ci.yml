@@ -37,7 +37,7 @@ build-all-rpm:
 #     - cp helper-scripts/scripts/* /usr/local/bin
 #     - mkdir ${CI_PROJECT_DIR}/docker/artifacts/
 #     - cp ${CI_PROJECT_DIR}/artifacts/*.x86_64.rpm ${CI_PROJECT_DIR}/docker/artifacts/
-#     - rm ${CI_PROJECT_DIR}/docker/*-debuginfo*.rpm
+#     - rm ${CI_PROJECT_DIR}/docker/artifacts/*-debuginfo*.rpm
 #     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
 #     - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
 #     - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
@@ -57,7 +57,7 @@ build-ngx-container:
     - cp helper-scripts/scripts/* /usr/local/bin
     - mkdir ${CI_PROJECT_DIR}/docker/artifacts/
     - cp ${CI_PROJECT_DIR}/artifacts/*.x86_64.rpm ${CI_PROJECT_DIR}/docker/artifacts/
-    - rm ${CI_PROJECT_DIR}/docker/*-debuginfo*.rpm
+    - rm ${CI_PROJECT_DIR}/docker/artifacts/*-debuginfo*.rpm
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
     - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
