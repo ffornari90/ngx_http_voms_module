@@ -35,7 +35,8 @@ build-ngx-httpg-container:
     - apk add git bash
     - git clone https://baltig.infn.it/mw-devel/helper-scripts.git helper-scripts
     - cp helper-scripts/scripts/* /usr/local/bin
-    - cp ${CI_PROJECT_DIR}/artifacts/*.x86_64.rpm ${CI_PROJECT_DIR}/docker/
+    - mkdir ${CI_PROJECT_DIR}/docker/artifacts/
+    - cp ${CI_PROJECT_DIR}/artifacts/*.x86_64.rpm ${CI_PROJECT_DIR}/docker/artifacts/
     - rm ${CI_PROJECT_DIR}/docker/*-debuginfo*.rpm
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
     - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
