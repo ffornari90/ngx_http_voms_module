@@ -9,6 +9,8 @@ __DATA__
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
+    load_module /etc/nginx/modules/ngx_http_echo_module.so;
 --- http_config
     server {
         error_log logs/error.log debug;

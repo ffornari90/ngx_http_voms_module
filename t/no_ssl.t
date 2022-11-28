@@ -8,6 +8,8 @@ __DATA__
 === TEST 1: HTTP connection, no SSL
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
+    load_module /etc/nginx/modules/ngx_http_echo_module.so;
 --- http_config
     server {
         error_log logs/error.log debug;

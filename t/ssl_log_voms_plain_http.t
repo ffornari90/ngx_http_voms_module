@@ -10,6 +10,8 @@ __DATA__
 === TEST 1: SSL server, logging a VOMS variabile, but plain HTTP request
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
+    load_module /etc/nginx/modules/ngx_http_echo_module.so;
 --- http_config
     log_format voms '$remote_addr - $remote_user [$time_local] '
                     '"$request" $status $body_bytes_sent '
