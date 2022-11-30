@@ -28,4 +28,8 @@ RUN rpm -ivh /pkgs/nginx-1.22.1-1.el7.ngx.x86_64.rpm && \
 # RUN yum -y install nginx nginx-module-njs && \
 #     rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
 
+EXPOSE 80
+
+STOPSIGNAL SIGQUIT
+
 CMD ["nginx", "-g", "daemon off;"]
