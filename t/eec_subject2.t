@@ -1,11 +1,10 @@
-
 use Test::Nginx::Socket 'no_plan';
 
 run_tests();
 
 __DATA__
 
-=== TEST 1: https with x509 client authentication, valid proxy certificate with expired VOMS attributes 
+=== TEST 1: standard x.509 certificate 
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
@@ -21,20 +20,21 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            return 200 "$voms_fqans\n$voms_user\n";
+            return 200 "$ssl_client_ee_s_dn\n$ssl_client_s_dn\n$ssl_client_ee_i_dn\n$ssl_client_i_dn\n";
         }
     }
 --- config
-    location = / { 
+    location = / {
         error_log logs/error-proxy.log debug;
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/1.cert.pem;
-        proxy_ssl_certificate_key ../../certs/1.key.pem;
+        proxy_ssl_certificate ../../certs/nginx_voms_example.cert.pem;
+        proxy_ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
     }
 --- request
 GET / 
---- response_body_like eval
-qr/\n\n/
---- error_log
-AC not valid anymore
+--- response_body
+CN=nginx-voms.example,O=IGI,C=IT
+CN=nginx-voms.example,O=IGI,C=IT
+CN=Test CA,O=IGI,C=IT
+CN=Test CA,O=IGI,C=IT
 --- error_code: 200

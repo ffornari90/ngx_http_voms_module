@@ -10,7 +10,6 @@ __DATA__
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
     load_module /etc/nginx/modules/ngx_http_voms_module.so;
-    load_module /etc/nginx/modules/ngx_http_echo_module.so;
 --- http_config
     server {
         error_log logs/error.log debug;
@@ -22,7 +21,7 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            echo $voms_generic_attributes;
+            return 200 "$voms_generic_attributes\n";
         }
     }
 --- config

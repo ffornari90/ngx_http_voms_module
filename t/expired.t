@@ -8,7 +8,6 @@ __DATA__
 === TEST 1: https with x509 client authentication, expired client certificate
 --- main_config
     load_module /etc/nginx/modules/ngx_http_voms_module.so;
-    load_module /etc/nginx/modules/ngx_http_echo_module.so;
 --- http_config
     server {
         error_log logs/error.log debug;
@@ -20,7 +19,7 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            echo $ssl_client_s_dn;
+            return 200 "$ssl_client_s_dn\n";
         }
     }
 --- config
