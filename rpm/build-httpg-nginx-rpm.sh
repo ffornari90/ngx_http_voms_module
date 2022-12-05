@@ -25,3 +25,7 @@ cp ${CI_PROJECT_DIR}/rpm/nginx.spec ~/rpmbuild/SPECS
 # build rpm
 rpmlint ~/rpmbuild/SPECS/nginx.spec
 rpmbuild -ba ~/rpmbuild/SPECS/nginx.spec
+
+mv ~/rpmbuild/RPMS/x86_64/nginx-1.22.1-1.el7.ngx.x86_64.rpm  ~/rpmbuild/RPMS/x86_64/nginx-httpg-1.22.1-1.el7.ngx.x86_64.rpm
+mv ~/rpmbuild/RPMS/x86_64/nginx-debuginfo-1.22.1-1.el7.ngx.x86_64.rpm  ~/rpmbuild/RPMS/x86_64/nginx-httpg-debuginfo-1.22.1-1.el7.ngx.x86_64.rpm
+mv ~/rpmbuild/SRPMS/nginx-1.22.1-1.el7.ngx.src.rpm  ~/rpmbuild/SRPMS/nginx-httpg-1.22.1-1.el7.ngx.src.rpm
