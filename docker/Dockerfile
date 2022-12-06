@@ -20,7 +20,7 @@ COPY artifacts/*.rpm /pkgs/
 COPY nginx.repo /etc/yum.repos.d/nginx.repo
 
 # install nginx httpg + voms and njs dynamic modules
-RUN rpm -ivh /pkgs/nginx-1.22.1-1.el7.ngx.x86_64.rpm && \
+RUN rpm -ivh /pkgs/nginx-httpg-1.22.1-1.el7.ngx.x86_64.rpm && \
     rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm && \
     yum install -y nginx-module-njs
 
