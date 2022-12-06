@@ -20,17 +20,17 @@ __DATA__
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
         ssl_verify_client on;
-	location = / {
+	    location = / {
             auth_request /authz;
 
             default_type text/plain;
             echo $some_var;
         }
-    location = /authz {
-        internal;
-        set $some_var $voms_user;
-        return 200;
-    }
+        location = /authz {
+            internal;
+            set $some_var $voms_user;
+            return 200;
+        }
     }
 --- config
     location = / {
