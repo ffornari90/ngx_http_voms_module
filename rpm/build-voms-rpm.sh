@@ -16,8 +16,6 @@ EOF
 # set sources
 cd ~/rpmbuild/SOURCES
 wget -O nginx-$ngxVersion.tar.gz https://nginx.org/download/nginx-$ngxVersion.tar.gz
-wget -O ./ngx-http-echo-module.tar.gz https://github.com/openresty/echo-nginx-module/archive/refs/tags/v0.63.tar.gz
-tar xzf ngx-http-echo-module.tar.gz
 
 # set voms modules sources
 mkdir ngx-http-voms-module

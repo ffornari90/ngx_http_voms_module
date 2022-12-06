@@ -13,7 +13,6 @@ URL:            https://github.com/lauracappelli/nginx-sd-rpm
 
 Source0:        https://nginx.org/download/nginx-%{base_version}.tar.gz
 Source1:        ngx-http-voms-module
-Source2:        echo-nginx-module-0.63
 
 BuildRequires:  gcc, make
 BuildRequires:  voms-devel
@@ -38,7 +37,7 @@ tar --strip-components=1 -zxf %{SOURCE0}
 
 %define CONFIG_PATH %(echo "--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp")
 %define CONFIG_ARGS %(echo "--user=nginx --group=nginx --with-compat --with-http_ssl_module")
-%define MODULE_CONFIG_ARGS %(echo "--add-dynamic-module=%SOURCE1 --add-dynamic-module=%SOURCE2")
+%define MODULE_CONFIG_ARGS %(echo "--add-dynamic-module=%SOURCE1")
 
 
 %build
@@ -75,7 +74,6 @@ To enable these modules, add the following to /etc/nginx/nginx.conf
 and reload nginx:
 
     load_module modules/ngx_http_voms_module.so;
-    load_module modules/ngx_http_echo_module.so;
 
 Please refer to the modules documentation for further details:
 https://baltig.infn.it/storm2/ngx_http_voms_module
