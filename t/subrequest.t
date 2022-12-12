@@ -1,4 +1,3 @@
-
 use Test::Nginx::Socket 'no_plan';
 
 run_tests();
@@ -24,11 +23,16 @@ __DATA__
             auth_request /authz;
 
             default_type text/plain;
+            # auth_request_set $pippo $some_var;
+            # echo $http_pluto;
             echo $some_var;
+            # echo $pippo;
+            # return 200 "$pippo\n";
         }
         location = /authz {
             internal;
             set $some_var $voms_user;
+            proxy_set_header pluto $voms_user;
             return 200;
         }
     }
