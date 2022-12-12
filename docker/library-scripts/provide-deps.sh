@@ -6,7 +6,7 @@
 set -ex
 
 yum -y install epel-release
-yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo && \
+yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
 
 yum -y install \
     hostname \
@@ -31,4 +31,4 @@ yum -y install \
     perl-Test-Nginx \
     perl-Digest-SHA \
     cpan \
-    Test::Nginx
+    voms-clients-java

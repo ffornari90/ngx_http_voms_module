@@ -43,4 +43,4 @@ yum -y install \
     rpmdevtools \
     rpmlint \
     cpan \
-    Test::Nginx
+    voms-clients-java
