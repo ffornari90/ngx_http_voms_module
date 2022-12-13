@@ -1,7 +1,7 @@
 # Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
 # SPDX-License-Identifier: EUPL-1.2
 
-FROM centos:7
+FROM almalinux
 
 # Allow customization of nginx user ID and name
 ARG USERNAME=nginx
@@ -20,13 +20,13 @@ COPY artifacts/*.rpm /pkgs/
 COPY nginx.repo /etc/yum.repos.d/nginx.repo
 
 # install nginx httpg + voms and njs dynamic modules
-RUN rpm -ivh /pkgs/nginx-httpg-1.22.1-1.el7.ngx.x86_64.rpm && \
-    rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm && \
-    yum install -y nginx-module-njs
+# RUN rpm -ivh /pkgs/nginx-httpg-1.22.1-1.el7.ngx.x86_64.rpm && \
+#     rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm && \
+#     yum install -y nginx-module-njs
 
 # install nginx + voms and njs dynamic modules
-# RUN yum -y install nginx nginx-module-njs && \
-#     rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
+RUN yum -y install nginx nginx-module-njs && \
+    rpm -ivh /pkgs/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
 
 EXPOSE 80
 

@@ -6,12 +6,14 @@
 set -ex
 
 yum -y install epel-release
-yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
+
+yum -y install wget 
+wget https://openresty.org/package/rhel/openresty.repo
+mv openresty.repo /etc/yum.repos.d/
 
 yum -y install \
     hostname \
     which \
-    wget \
     tar \
     sudo \
     file \
@@ -27,8 +29,5 @@ yum -y install \
     gcc-c++ \
     rpmdevtools \
     rpmlint \
-    perl-ExtUtils-Embed \
-    perl-Test-Nginx \
-    perl-Digest-SHA \
     cpan \
     voms-clients-java
