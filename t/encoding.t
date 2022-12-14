@@ -34,5 +34,5 @@ __DATA__
 --- request
 GET / 
 --- response_body
-n=nickname v=newland86 q=test.vo,n=title v=assegnista%25di%25ricerca%40CNAF q=test.vo
+n=nickname v=sd q=test.vo,n=title v=assegnista%25di%25ricerca%40CNAF q=test.vo
 --- error_code: 200

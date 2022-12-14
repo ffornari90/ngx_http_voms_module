@@ -40,10 +40,10 @@ GET /
 /C=IT/O=IGI/CN=*.test.example
 /C=IT/O=IGI/CN=Test CA
 test.vo
-*.test.example:15000
-20211110000000Z
+voms.example:15000
+20221210000000Z
 20311231000000Z
-n=nickname v=newland q=test.vo,n=nickname v=giaco q=test.vo
+n=nickname v=sd q=test.vo,n=nickname v=cnaf q=test.vo
 01E240
 --- error_code: 200
 
