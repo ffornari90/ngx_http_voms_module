@@ -14,8 +14,8 @@ __DATA__
     server {
         error_log logs/error.log debug;
         listen 8443 ssl;
-        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-        ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
+        ssl_certificate ../../certs/star.test.example.cert.pem;
+        ssl_certificate_key ../../certs/star.test.example.key.pem;
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
         ssl_verify_client on;
@@ -37,10 +37,10 @@ GET /
 /C=IT/O=IGI/CN=test0
 /C=IT/O=IGI/CN=Test CA
 /test.vo/exp1,/test.vo/exp2,/test.vo/exp3/Role=PIPPO
-/C=IT/O=IGI/CN=voms.example
+/C=IT/O=IGI/CN=*.test.example
 /C=IT/O=IGI/CN=Test CA
 test.vo
-voms.example:15000
+*.test.example:15000
 20211110000000Z
 20311231000000Z
 n=nickname v=newland q=test.vo,n=nickname v=giaco q=test.vo
