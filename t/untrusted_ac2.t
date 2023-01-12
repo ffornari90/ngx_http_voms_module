@@ -27,8 +27,8 @@ __DATA__
 --- config
     location = / {
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/3.cert.pem;
-        proxy_ssl_certificate_key ../../certs/3.key.pem;
+        proxy_ssl_certificate ../../certs/5.cert.pem;
+        proxy_ssl_certificate_key ../../certs/5.key.pem;
     }
 --- request
 GET /
