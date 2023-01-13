@@ -27,8 +27,8 @@ __DATA__
     location = / {
         error_log logs/error-proxy.log debug;
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/7.cert.pem;
-        proxy_ssl_certificate_key ../../certs/7.key.pem;
+        proxy_ssl_certificate ../../certs/6.cert.pem;
+        proxy_ssl_certificate_key ../../certs/6.key.pem;
     }
 --- request
 GET / 
