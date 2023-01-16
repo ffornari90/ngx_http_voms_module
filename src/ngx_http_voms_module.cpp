@@ -1,4 +1,4 @@
-// Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+// Copyright 2018-2023 Istituto Nazionale di Fisica Nucleare
 // SPDX-License-Identifier: EUPL-1.2
 
 extern "C" {
