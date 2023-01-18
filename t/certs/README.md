@@ -61,7 +61,14 @@ The following certificates and proxy certificates are used in these tests:
   $ voms-proxy-init -cert t/certs/3.cert.pem -key t/certs/3.key.pem --valid 10000:0 --vomsdir t/vomsdir --certdir t/trust-anchors --vomses t/vomses
   ```
 
-* `9.pem`: EEC plus CA certificate included in the chain.
+* `9.pem`: EEC plus CA certificate included in the chain. Obtained with:
+
+  ```shell
+  $ openssl x509 -in t/certs/test0.cert.pem >> t/certs/9.pem
+  $ cat trust-anchors/igi-test-ca.pem >> t/certs/9.pem
+  $ echo >> t/certs/9.pem
+  $ openssl rsa -in t/certs/test0.key.pem -out t/certs/9.key.pem
+  ```
 
 `star.test.example.cert.pem` and `star.test.example.key.pem` are the credentials of a trusted VOMS server.
 
