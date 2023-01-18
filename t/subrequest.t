@@ -19,22 +19,17 @@ __DATA__
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
         ssl_verify_client on;
-	    location = / {
+	location = / {
             auth_request /authz;
 
             default_type text/plain;
-            # auth_request_set $pippo $some_var;
-            # echo $http_pluto;
             echo $some_var;
-            # echo $pippo;
-            # return 200 "$pippo\n";
         }
-        location = /authz {
-            internal;
-            set $some_var $voms_user;
-            proxy_set_header pluto $voms_user;
-            return 200;
-        }
+    location = /authz {
+        internal;
+        set $some_var $voms_user;
+        return 200;
+    }
     }
 --- config
     location = / {
