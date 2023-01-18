@@ -1,13 +1,14 @@
 function connect(r) {
-    let sock = ngx.socket.tcp();
-    let ok, err = sock.connect("127.0.0.1", 8443);
-    if (!ok) {
-        ngx.say("failed to connect to upstream: ", err);
-        return;
+    r.log("vivo");
+    var sock = new TCPSocket("127.0.0.1", 8443);
+    if (!sock.status) {
+        r.log("failed to connect to upstream: ");
+        r.return(500);
     }
-    ngx.say("successfully connected to upstream!");
-    sock.send("G");
+    r.log("successfully connected to upstream!");
+    sock.writeable.write("G");
     sock.close();
+    r.return(200);
 }
   
 export default {connect}

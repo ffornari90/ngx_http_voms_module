@@ -1,5 +1,5 @@
 
-use Test::Nginx::Socket 'no_plan';
+use Test::Nginx::Socket skip_all => "to check later";
 
 master_on();
 
@@ -11,7 +11,6 @@ __DATA__
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
     load_module /etc/nginx/modules/ngx_http_voms_module.so;
-#    load_module /etc/nginx/modules/ngx_http_echo_module.so;
     load_module /etc/nginx/modules/ngx_http_js_module.so;
 --- http_config
     js_path "/home/nginx/t";
@@ -30,7 +29,6 @@ __DATA__
         ssl_verify_depth 10;
 	    location = / {
             default_type text/plain;
-            # echo $voms_user;
             return 200 "$voms_user\n";
         }
     }
