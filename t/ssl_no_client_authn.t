@@ -13,8 +13,8 @@ __DATA__
     server {
         error_log logs/error.log debug;
         listen 8443 ssl;
-        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-        ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
+        ssl_certificate ../../certs/star.test.example.cert.pem;
+        ssl_certificate_key ../../certs/star.test.example.key.pem;
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
 	location = / {

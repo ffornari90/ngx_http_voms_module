@@ -1,1 +1,1 @@
-"test.vo" "voms.example" "15000" "/C=IT/O=IGI/CN=voms.example" "test.vo"
+"test.vo" "test.example" "15000" "/C=IT/O=IGI/CN=*.test.example" "test.vo"

@@ -14,8 +14,8 @@ __DATA__
     server {
         error_log logs/error.log debug;
         listen 8443 ssl;
-        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-        ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
+        ssl_certificate ../../certs/star.test.example.cert.pem;
+        ssl_certificate_key ../../certs/star.test.example.key.pem;
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
         ssl_verify_client on;
@@ -34,5 +34,5 @@ __DATA__
 --- request
 GET / 
 --- response_body
-n=nickname v=newland86 q=test.vo,n=title v=assegnista%25di%25ricerca%40CNAF q=test.vo
+n=nickname v=sd q=test.vo,n=title v=assegnista%25di%25ricerca%40CNAF q=test.vo
 --- error_code: 200

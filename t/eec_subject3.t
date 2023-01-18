@@ -13,8 +13,8 @@ __DATA__
     server {
         error_log logs/error.log debug;
         listen 8443 ssl;
-        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-        ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
+        ssl_certificate ../../certs/star.test.example.cert.pem;
+        ssl_certificate_key ../../certs/star.test.example.key.pem;
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
         ssl_verify_client on;
@@ -27,8 +27,8 @@ __DATA__
     location = / {
         error_log logs/error-proxy.log debug;
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/7.cert.pem;
-        proxy_ssl_certificate_key ../../certs/7.key.pem;
+        proxy_ssl_certificate ../../certs/6.cert.pem;
+        proxy_ssl_certificate_key ../../certs/6.key.pem;
     }
 --- request
 GET / 

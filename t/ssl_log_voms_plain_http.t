@@ -11,11 +11,11 @@ __DATA__
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
     load_module /etc/nginx/modules/ngx_http_voms_module.so;
+#    load_module /etc/nginx/modules/ngx_http_echo_module.so;
     load_module /etc/nginx/modules/ngx_http_js_module.so;
-    load_module /etc/nginx/modules/ngx_http_echo_module.so;
 --- http_config
     js_path "/home/nginx/t";
-    js_import socket.js;
+    js_import jslib from socket.js;
     log_format voms '$remote_addr - $remote_user [$time_local] '
                     '"$request" $status $body_bytes_sent '
                     '"$http_referer" "$http_user_agent" '
@@ -24,8 +24,8 @@ __DATA__
         error_log logs/error.log debug;
         access_log logs/access.log voms;
         listen 8443 ssl;
-        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-        ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
+        ssl_certificate ../../certs/star.test.example.cert.pem;
+        ssl_certificate_key ../../certs/star.test.example.key.pem;
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
 	    location = / {
