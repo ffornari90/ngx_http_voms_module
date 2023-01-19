@@ -16,6 +16,3 @@ RUN yum update -y && \
     yum clean all && rm -rf /var/cache/yum
 
 USER $USERNAME
-
-COPY nginx.repo /etc/yum.repos.d/nginx.repo
-RUN sudo yum -y install nginx nginx-module-njs
