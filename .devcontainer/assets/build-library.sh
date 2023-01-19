@@ -30,7 +30,10 @@ cd ~/rpmbuild/SOURCES/
 wget http://nginx.org/packages/centos/7/SRPMS/nginx-$ngxVersion-1.el7.ngx.src.rpm
 rpm2cpio nginx-$ngxVersion-1.el7.ngx.src.rpm | cpio -idm
 
-cd /workspaces/ngx_http_voms_module
+if [ -z ${CI_PROJECT_DIR} ]; then
+    CI_PROJECT_DIR="/workspaces/ngx_http_voms_module";
+fi
+cd $CI_PROJECT_DIR
 
 }
 
