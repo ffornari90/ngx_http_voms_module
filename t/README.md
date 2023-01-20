@@ -31,19 +31,6 @@ cd /tmp
 prove -v
 ```
 
-### Test coverage
-
-To enable test coverage pass the `--coverage` option to both the compiler and the linker. For example:
-
-```shell
-$ ./configure ${RESTY_CONFIG_OPTIONS} --add-module=../ngx_http_voms_module --with-debug --with-cc-opt="-g -Og --coverage" --with-ld-opt="--coverage"
-$ make && make install
-```
-
-The above command generates data files aside the source files for all Nginx. To enable coverage only for `ngx_http_voms_module` the `--coverage` option should be passed only when compiling `ngx_http_voms_module.cpp`, adding the option to `config.make`.
-
-Running the tests will then create other data files with coverage information. To view that information, run `gcov <object file>`, e.g. `gcov .../objs/addon/src/ngx_http_voms_module.o`. This will produce files with the `.gcov` extension in the current directory.
-
 ### Testing directly the Nginx server
 
 You can reuse the config file `t/servroot/conf/nginx.conf` produced by `test::Nginx`, which contains something like
