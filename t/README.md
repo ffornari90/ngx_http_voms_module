@@ -74,7 +74,7 @@ server {
 Start nginx:
 
 ```shell
-$ nginx -p t/servroot -e logs/error.log
+$ nginx -c conf/nginx.conf -p t/servroot/ -elogs/error.log
 ```
 
 Modify (as root) `/etc/hosts` so that `nginx-voms.example` is an alias for `localhost`:
