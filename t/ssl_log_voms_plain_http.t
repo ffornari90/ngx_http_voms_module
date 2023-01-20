@@ -13,6 +13,11 @@ __DATA__
     load_module /etc/nginx/modules/ngx_http_voms_module.so;
     load_module /etc/nginx/modules/ngx_http_js_module.so;
 --- http_config
+    client_body_temp_path /tmp/client_temp;
+    proxy_temp_path       /tmp/proxy_temp_path;
+    fastcgi_temp_path     /tmp/fastcgi_temp;
+    uwsgi_temp_path       /tmp/uwsgi_temp;
+    scgi_temp_path        /tmp/scgi_temp;
     js_path "/home/nginx/t";
     js_import jslib from socket.js;
     log_format voms '$remote_addr - $remote_user [$time_local] '
