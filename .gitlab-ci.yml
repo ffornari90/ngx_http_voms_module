@@ -1,10 +1,11 @@
 
 stages:
-  - build-rpms
-  - docker-build-ngx-httpg-voms
+  - build
+  - docker-build
+  - docker-push
 
 build-rpms:
-  stage: build-rpms
+  stage: build
   image: centos:7
   script: 
     - env | sort
@@ -22,8 +23,8 @@ build-rpms:
     paths:
       - docker/artifacts/
 
-build-ngx-httpg-voms-module-container:
-  stage: docker-build-ngx-httpg-voms
+docker-build-rpms:
+  stage: docker-build
   image: docker:latest
   services:
     - name: docker:dind
@@ -39,3 +40,25 @@ build-ngx-httpg-voms-module-container:
     - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
     - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
     - cd docker && build-docker-image.sh && push-docker-image.sh
+
+push-to-dockerhub:
+  stage: docker-push
+  image: docker:latest
+  services:
+    - name: docker:dind
+      command: ["--tls=false"]
+  dependencies:
+    - docker-build-rpms
+  script:
+    - apk add git bash
+    - git clone https://baltig.infn.it/mw-devel/helper-scripts.git helper-scripts
+    - cp helper-scripts/scripts/* /usr/local/bin
+    - export DOCKER_PUSH_TO_DOCKERHUB=y
+    - env | sort
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - export DOCKER_REGISTRY_HOST=${CI_REGISTRY}
+    - export DOCKER_REGISTRY_NAMESPACE=${CI_PROJECT_PATH}
+    - cd docker && pull-docker-image.sh && unset DOCKER_REGISTRY_HOST
+    - docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD} && push-docker-image.sh
+  only:
+    - master
