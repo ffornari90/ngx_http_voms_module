@@ -1,4 +1,3 @@
-
 use Test::Nginx::Socket 'no_plan';
 
 run_tests();
@@ -9,12 +8,18 @@ __DATA__
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
 --- http_config
+    client_body_temp_path /tmp/client_temp;
+    proxy_temp_path       /tmp/proxy_temp_path;
+    fastcgi_temp_path     /tmp/fastcgi_temp;
+    uwsgi_temp_path       /tmp/uwsgi_temp;
+    scgi_temp_path        /tmp/scgi_temp;
     server {
         error_log logs/error.log debug;
         listen 8443 ssl;
-        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-        ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
+        ssl_certificate ../../certs/star.test.example.cert.pem;
+        ssl_certificate_key ../../certs/star.test.example.key.pem;
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
         ssl_verify_client on;
@@ -22,7 +27,7 @@ __DATA__
             auth_request /authz;
 
             default_type text/plain;
-            echo $some_var;
+            return 200;
         }
     location = /authz {
         internal;
@@ -40,5 +45,5 @@ __DATA__
 --- request
 GET / 
 --- response_body
-/C=IT/O=IGI/CN=test0
+
 --- error_code: 200

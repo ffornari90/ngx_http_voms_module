@@ -4,17 +4,17 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: EEC chain containing CA certificate
+=== TEST 1: rfc proxy certificate, no AC
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
-	load_module /etc/nginx/modules/ngx_http_voms_module.so;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
 --- http_config
     client_body_temp_path /tmp/client_temp;
     proxy_temp_path       /tmp/proxy_temp_path;
     fastcgi_temp_path     /tmp/fastcgi_temp;
     uwsgi_temp_path       /tmp/uwsgi_temp;
-    scgi_temp_path        /tmp/scgi_temp;
+    scgi_temp_path        /tmp/scgi_temp;	
     server {
         error_log logs/error.log debug;
         listen 8443 ssl;
@@ -25,15 +25,15 @@ __DATA__
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-			return 200 "$ssl_client_ee_cert\n";
+            return 200 "$ssl_client_ee_cert\n";
         }
     }
 --- config
     location = / {
         error_log logs/error-proxy.log debug;
         proxy_pass https://localhost:8443/;
-        proxy_ssl_certificate ../../certs/9.pem;
-        proxy_ssl_certificate_key ../../certs/9.key.pem;
+        proxy_ssl_certificate ../../certs/0.cert.pem;
+        proxy_ssl_certificate_key ../../certs/0.key.pem;
     }
 --- request
 GET / 

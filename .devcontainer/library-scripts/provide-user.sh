@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2018-2022 Istituto Nazionale di Fisica Nucleare
+# Copyright 2018-2023 Istituto Nazionale di Fisica Nucleare
 # SPDX-License-Identifier: EUPL-1.2
 
 USERNAME=${1}
@@ -51,22 +51,7 @@ EOF
 )"
 
 USER_RC_PATH="/home/${USERNAME}"
-
 echo "${CODESPACES_BASH}" >> "${USER_RC_PATH}/.bashrc"
-
-cat << EOF >> "${USER_RC_PATH}/.bashrc"
-if [ -f "\${HOME}/openresty-env" ]; then
-    . \${HOME}/openresty-env
-fi
-
-if [ -n "\${PS1}" ]; then
-    echo
-    echo "To build and install openresty with the ngx_http_voms_module run"
-    echo "    sh build-install-openresty-voms.sh"
-    echo
-fi
-EOF
-
 chown ${USERNAME}:${USER_GID} "${USER_RC_PATH}/.bashrc"
 
 echo "Done!"

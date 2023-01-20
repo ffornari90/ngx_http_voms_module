@@ -9,28 +9,24 @@ __DATA__
 --- main_config
     env X509_VOMS_DIR=t/vomsdir;
     env X509_CERT_DIR=t/trust-anchors;
+    load_module /etc/nginx/modules/ngx_http_voms_module.so;
 --- http_config
+    client_body_temp_path /tmp/client_temp;
+    proxy_temp_path       /tmp/proxy_temp_path;
+    fastcgi_temp_path     /tmp/fastcgi_temp;
+    uwsgi_temp_path       /tmp/uwsgi_temp;
+    scgi_temp_path        /tmp/scgi_temp;
     server {
         error_log logs/error.log debug;
         listen 8443 ssl;
-        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-        ssl_certificate_key ../../certs/nginx_voms_example.key.pem;
+        ssl_certificate ../../certs/star.test.example.cert.pem;
+        ssl_certificate_key ../../certs/star.test.example.key.pem;
         ssl_client_certificate ../../trust-anchors/igi-test-ca.pem;
         ssl_verify_depth 10;
         ssl_verify_client on;
 	location = / {
             default_type text/plain;
-            echo $voms_user; 
-            echo $voms_user_ca;
-            echo $voms_fqans;
-            echo $voms_server; 
-            echo $voms_server_ca;
-            echo $voms_vo; 
-            echo $voms_server_uri;
-            echo $voms_not_before;
-            echo $voms_not_after;
-            echo $voms_generic_attributes;
-            echo $voms_serial;
+            return 200 "$voms_user\n$voms_user_ca\n$voms_fqans\n$voms_server\n$voms_server_ca\n$voms_vo\n$voms_server_uri\n$voms_not_before\n$voms_not_after\n$voms_generic_attributes\n$voms_serial\n";
         }
     }
 --- config
@@ -46,13 +42,13 @@ GET /
 /C=IT/O=IGI/CN=test0
 /C=IT/O=IGI/CN=Test CA
 /test.vo/exp1,/test.vo/exp2,/test.vo/exp3/Role=PIPPO
-/C=IT/O=IGI/CN=voms.example
+/C=IT/O=IGI/CN=*.test.example
 /C=IT/O=IGI/CN=Test CA
 test.vo
 voms.example:15000
-20211110000000Z
+20221210000000Z
 20311231000000Z
-n=nickname v=newland q=test.vo,n=nickname v=giaco q=test.vo
+n=nickname v=sd q=test.vo,n=nickname v=cnaf q=test.vo
 01E240
 --- error_code: 200
 

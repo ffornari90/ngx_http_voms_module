@@ -5,11 +5,7 @@
 
 set -ex
 
-yum -y install \
-    https://repo.ius.io/ius-release-el7.rpm \
-    centos-release-scl \
-    epel-release
-
+yum -y install epel-release
 yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
 
 yum -y install \
@@ -19,28 +15,20 @@ yum -y install \
     tar \
     sudo \
     file \
-    less \
-    git236 \
-    devtoolset-10 \
-    gcc-c++ \
-    GeoIP-devel \
-    gd-devel \
+    readline \
     gettext \
-    ccache \
-    libxslt-devel \
-    lcov \
-    perl-ExtUtils-Embed \
-    perl-Test-Nginx \
-    perl-Digest-SHA \
-    readline-devel \
-    boost-devel \
-    voms-devel \
-    make \
-    patch \
+    less \
     openssl \
     zlib-devel \
     pcre2-devel \
+    boost-devel \
+    voms-devel \
+    patch \
+    gcc-c++ \
     rpmdevtools \
     rpmlint \
+    perl-ExtUtils-Embed \
+    perl-Test-Nginx \
+    perl-Digest-SHA \
     cpan \
     voms-clients-java
