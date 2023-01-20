@@ -31,22 +31,35 @@ cd /tmp
 prove -v
 ```
 
+Note: the alert below is unavoidable, but it doesn't affect the tests.
+```
+[alert] could not open error log file: open() "/var/log/nginx/error.log" failed (13: Permission denied)
+```
+
 ### Testing directly the Nginx server
 
 You can reuse the config file `t/servroot/conf/nginx.conf` produced by `test::Nginx`, which contains something like
 
 ```
-server {
-    listen 8443 ssl;
-    server_name     nginx-voms.example;
-    ssl_certificate ../../certs/nginx_voms_example.cert.pem;
-    ssl_certificate_key ./certs/nginx_voms_example.key.pem;
-    ssl_client_certificate ./trust-anchors/igi-test-ca.pem;
-    ssl_verify_depth 10;
-    ssl_verify_client on;
-    location = / {
-        echo user: $voms_user;
+http {
+    client_body_temp_path /tmp/client_temp;
+    proxy_temp_path       /tmp/proxy_temp_path;
+    fastcgi_temp_path     /tmp/fastcgi_temp;
+    uwsgi_temp_path       /tmp/uwsgi_temp;
+    scgi_temp_path        /tmp/scgi_temp;
+    server {
+        listen 8443 ssl;
+        server_name     nginx-voms.example;
+        ssl_certificate ../../certs/nginx_voms_example.cert.pem;
+        ssl_certificate_key ./certs/nginx_voms_example.key.pem;
+        ssl_client_certificate ./trust-anchors/igi-test-ca.pem;
+        ssl_verify_depth 10;
+        ssl_verify_client on;
+        location = / {
+            echo user: $voms_user;
+        }
     }
+    ...
 }
 ```
 
@@ -61,7 +74,7 @@ server {
 Start nginx:
 
 ```shell
-$ nginx -p t/servroot
+$ nginx -p t/servroot -e logs/error.log
 ```
 
 Modify (as root) `/etc/hosts` so that `nginx-voms.example` is an alias for `localhost`:
