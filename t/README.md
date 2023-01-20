@@ -25,7 +25,7 @@ from `t`' s parent directory.
 The `prove` command creates a directory called `servroot` in `t`, so if the `t` folder is accessible read-only, for
 example in a docker container, just make a copy somewhere else and run the tests from there:
 
-```
+```shell
 cp -r t /tmp
 cd /tmp
 prove -v

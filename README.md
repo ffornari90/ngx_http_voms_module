@@ -6,7 +6,7 @@
 
 `ngx_http_voms_module` is a module for the [Nginx web server](https://www.nginx.org/) that enables client-side authentication based on X.509 proxy certificates augmented with VOMS Attribute Certificates, typically obtained from a [Virtual Organization Membership Service](https://italiangrid.github.io/voms/) (VOMS) server.
 
-The module defines a set of [*embedded* variables](###embedded-variables), whose values are extracted from the first Attribute Certificate found in the certificate chain.
+The module defines a set of *embedded* variables, whose values are extracted from the first Attribute Certificate found in the certificate chain.
 
 ### Embedded Variables
 
@@ -99,7 +99,7 @@ The software dependecies are listed in the [provide-deps](docker/library-scripts
 
 The nginx source files are also needed. To download them in ```/tmp/nginx-x.y.z``` you can execute:
 
-```
+```shell
 $ ngxVersion=<version>
 $ wget -O /tmp/nginx-$ngxVersion.tar.gz https://nginx.org/download/nginx-$ngxVersion.tar.gz
 $ cd /tmp && tar -xzvf /tmp/nginx-$ngxVersion.tar.gz && cd -
