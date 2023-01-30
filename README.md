@@ -116,7 +116,7 @@ $ make && make install
 
 ### Docker container
 
-A Docker image with nginx and the `ngx_http_voms_module` is available, you can find it [here](https://hub.docker.com/r/storm2/openresty-voms).
+A Docker image with nginx and the `ngx_http_voms_module` is available, you can find it [here](https://hub.docker.com/r/storm2/nginx-httpg-voms).
 
 ### For the developers
 A [.devcontainer](.devcontainer) is provided for the developers with all the instructions on how to use it, how to build the rpm module and how to install it.
