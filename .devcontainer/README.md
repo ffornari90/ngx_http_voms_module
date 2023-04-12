@@ -4,20 +4,20 @@ A devcontainer is ready to use for the developers. A set of packages without ngi
 
 ## How to build and install nginx with or without httpg patch
 
-To build and install the last stable version of [nginx](http://nginx.org/en/download.html) (1.22.1) you have to copy the ```nginx.repo``` file (it is contained in the ```docker``` directory) into the ```/etc/yum.repos.d/``` directory and install nginx with yum:
+To build and install the last stable version of [nginx](http://nginx.org/en/download.html) (1.24.0) you have to copy the ```nginx.repo``` file (it is contained in the ```docker``` directory) into the ```/etc/yum.repos.d/``` directory and install nginx with yum:
 
 ```shell
 $ sudo cp docker/nginx.repo /etc/yum.repos.d/
 $ sudo yum install -y nginx
 ```
 
-Otherwise, if you want to build and install the last stable version of [nginx](http://nginx.org/en/download.html) (1.22.1) with the httpg patch, a bash library is ready to use. You can source it and follow the commands below:
+Otherwise, if you want to build and install the last stable version of [nginx](http://nginx.org/en/download.html) (1.24.0) with the httpg patch, a bash library is ready to use. You can source it and follow the commands below:
 
 ```shell
 $ source .devcontainer/assets/build-library.sh
 $ downloadNginx
 $ buildHttpgNginxRPM
-$ sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/nginx-httpg-1.22.1-1.el7.ngx.x86_64.rpm
+$ sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/nginx-httpg-1.24.0-1.el7.ngx.x86_64.rpm
 ```
 
 ## How to build and install the `ngx_http_voms_module`
@@ -28,5 +28,5 @@ If you want to build and install the `ngx_http_voms_module`, nginx have to be in
 $ source .devcontainer/assets/build-library.sh
 $ downloadNginx
 $ buildVomsModuleRPM
-$ sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/nginx-module-http-voms-1.22.1-1.el7.x86_64.rpm
+$ sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/nginx-module-http-voms-1.24.0-1.el7.x86_64.rpm
 ```
