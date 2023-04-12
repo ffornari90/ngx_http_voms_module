@@ -18,6 +18,7 @@ Requires(postun): systemd
 Epoch: %{epoch}
 Requires(pre): shadow-utils
 Requires: openssl >= 1.0.2
+Requires: procps-ng
 BuildRequires: openssl-devel >= 1.0.2
 %define dist .el7
 %endif
@@ -27,6 +28,7 @@ BuildRequires: openssl-devel >= 1.0.2
 Epoch: %{epoch}
 Requires(pre): shadow-utils
 Requires: openssl11 >= 1.1.1
+Requires: procps-ng
 BuildRequires: openssl11-devel >= 1.1.1
 %endif
 
@@ -34,6 +36,7 @@ BuildRequires: openssl11-devel >= 1.1.1
 %define epoch 1
 Epoch: %{epoch}
 Requires(pre): shadow-utils
+Requires: procps-ng
 BuildRequires: openssl-devel >= 1.1.1
 %define _debugsource_template %{nil}
 %endif
@@ -42,6 +45,7 @@ BuildRequires: openssl-devel >= 1.1.1
 %define epoch 1
 Epoch: %{epoch}
 Requires(pre): shadow-utils
+Requires: procps-ng
 BuildRequires: openssl-devel
 %define _debugsource_template %{nil}
 %endif
@@ -50,6 +54,7 @@ BuildRequires: openssl-devel
 %define _group Productivity/Networking/Web/Servers
 %define nginx_loggroup trusted
 Requires(pre): shadow
+Requires: procps
 BuildRequires: libopenssl-devel
 %define _debugsource_template %{nil}
 %endif
@@ -58,13 +63,14 @@ BuildRequires: libopenssl-devel
 %define _debugsource_template %{nil}
 %global _hardened_build 1
 %define _group System Environment/Daemons
+Requires: procps-ng
 BuildRequires: openssl-devel
 Requires(pre): shadow-utils
 %endif
 
 # end of distribution specific definitions
 
-%define base_version 1.22.1
+%define base_version 1.24.0
 %define base_release 1%{?dist}.ngx
 
 %define bdir %{_builddir}/%{name}-%{base_version}
@@ -302,11 +308,29 @@ if [ $1 -ge 1 ]; then
 fi
 
 %changelog
-* Wed Oct 19 2022 Nginx Packaging <nginx-packaging@f5.com> - 1.22.1-1%{?dist}.ngx
-- 1.22.1-1
+* Wed Apr 12 2023 Laura Cappelli - 1.24.0-1%{?dist}.ngx
+- Add HTTPG patch to nginx 1.24.0-1.0.0
 
-* Tue May 24 2022 Konstantin Pavlov <thresh@nginx.com> - 1.22.0-1%{?dist}.ngx
-- 1.22.0-1
+* Wed Apr 12 2023 Laura Cappelli - 1.24.0-1%{?dist}.ngx
+- 1.24.0-1
+
+* Tue Apr 11 2023 Nginx Packaging <nginx-packaging@f5.com> - 1.24.0-1%{?dist}.ngx
+- 1.24.0-1
+
+* Tue Mar 28 2023 Nginx Packaging <nginx-packaging@f5.com> - 1.23.4-1%{?dist}.ngx
+- 1.23.4-1
+
+* Tue Dec 13 2022 Nginx Packaging <nginx-packaging@f5.com> - 1.23.3-1%{?dist}.ngx
+- 1.23.3-1
+
+* Wed Oct 19 2022 Nginx Packaging <nginx-packaging@f5.com> - 1.23.2-1%{?dist}.ngx
+- 1.23.2-1
+
+* Tue Jul 19 2022 Nginx Packaging <nginx-packaging@f5.com> - 1.23.1-1%{?dist}.ngx
+- 1.23.1-1
+
+* Tue Jun 21 2022 Nginx Packaging <nginx-packaging@f5.com> - 1.23.0-1%{?dist}.ngx
+- 1.23.0-1
 
 * Tue Jan 25 2022 Mikhail Isachenkov <mikhail.isachenkov@nginx.com> - 1.21.6-1%{?dist}.ngx
 - 1.21.6-1
