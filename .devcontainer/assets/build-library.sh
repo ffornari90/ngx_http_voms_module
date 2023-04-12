@@ -7,7 +7,7 @@ downloadNginx() {
 
 # check if a version of nginx is specified
 if [ -z ${ngxVersion} ]; then
-    ngxVersion=1.22.1
+    ngxVersion=1.24.0
 fi
 echo "nginx version required: ${ngxVersion}";
 
