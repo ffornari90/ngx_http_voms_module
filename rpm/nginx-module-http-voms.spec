@@ -1,10 +1,10 @@
 %define nginx_user nginx
 %define nginx_group nginx
-%define base_version 1.22.1
+%define base_version 1.24.0
 %define bdir %{_builddir}/%{name}-%{base_version}
 
 Name:           nginx-module-http-voms
-Version:        1.22.1
+Version:        1.24.0
 Release:        1%{?dist}
 Summary:        nginx http voms dynamic modules
 
@@ -84,5 +84,8 @@ fi
 
 
 %changelog
+* Wed Apr 12 2023 Laura Cappelli
+- nginx http voms module updated to 1.24.0-1.0.0
+
 * Fri Nov 18 2022 Laura Cappelli
 - nginx http voms module updated to 1.22.1-1.0.0
