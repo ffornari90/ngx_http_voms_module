@@ -1,6 +1,6 @@
 # `ngx_http_voms_module`
 
-[![pipeline status](https://baltig.infn.it/storm2/ngx_http_voms_module/badges/master/pipeline.svg)](https://baltig.infn.it/storm2/ngx_http_voms_module/commits/master)
+[![pipeline status](https://baltig.infn.it/cnafsd/ngx_http_voms_module/badges/master/pipeline.svg)](https://baltig.infn.it/cnafsd/ngx_http_voms_module/commits/master)
 
 ## Description
 
@@ -116,7 +116,7 @@ $ make && make install
 
 ### Docker container
 
-A Docker image with nginx and the `ngx_http_voms_module` is available, you can find it [here](https://hub.docker.com/r/storm2/nginx-httpg-voms).
+A Docker image with nginx and the `ngx_http_voms_module` is available, you can find it [here](https://hub.docker.com/r/cnafsd/nginx-httpg-voms).
 
 ### For the developers
 A [.devcontainer](.devcontainer) is provided for the developers with all the instructions on how to use it, how to build the rpm module and how to install it.

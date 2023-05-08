@@ -9,7 +9,7 @@ Release:        1%{?dist}
 Summary:        nginx http voms dynamic modules
 
 License:        EUPL-1.2
-URL:            https://baltig.infn.it/storm2/ngx_http_voms_module
+URL:            https://baltig.infn.it/cnafsd/ngx_http_voms_module
 
 Source0:        https://nginx.org/download/nginx-%{base_version}.tar.gz
 Source1:        ngx-http-voms-module
@@ -76,7 +76,7 @@ and reload nginx:
     load_module modules/ngx_http_voms_module.so;
 
 Please refer to the modules documentation for further details:
-https://baltig.infn.it/storm2/ngx_http_voms_module
+https://baltig.infn.it/cnafsd/ngx_http_voms_module
 
 ----------------------------------------------------------------------
 BANNER
