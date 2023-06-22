@@ -31,4 +31,6 @@ yum -y install \
     perl-Test-Nginx \
     perl-Digest-SHA \
     cpan \
-    voms-clients-java
+    voms-clients-java \
+    git \
+    golang

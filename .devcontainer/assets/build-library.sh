@@ -31,7 +31,7 @@ wget http://nginx.org/packages/centos/7/SRPMS/nginx-$ngxVersion-1.el7.ngx.src.rp
 rpm2cpio nginx-$ngxVersion-1.el7.ngx.src.rpm | cpio -idm
 
 if [ -z ${CI_PROJECT_DIR} ]; then
-    CI_PROJECT_DIR="/workspaces/ngx_http_voms_module";
+    CI_PROJECT_DIR="$HOME/ngx_http_voms_module";
 fi
 cd $CI_PROJECT_DIR
 
@@ -40,7 +40,7 @@ cd $CI_PROJECT_DIR
 buildHttpgNginxRPM() {
 
 if [ -z ${CI_PROJECT_DIR} ]; then
-    CI_PROJECT_DIR="/workspaces/ngx_http_voms_module";
+    CI_PROJECT_DIR="$HOME/ngx_http_voms_module";
 fi
 
 # set the nginx spec file with the httpg patch
@@ -64,7 +64,7 @@ cd ${CI_PROJECT_DIR}
 buildVomsModuleRPM() {
 
 if [ -z ${CI_PROJECT_DIR} ]; then
-    CI_PROJECT_DIR="/workspaces/ngx_http_voms_module";
+    CI_PROJECT_DIR="$HOME/ngx_http_voms_module";
 fi
 
 # set voms modules sources
