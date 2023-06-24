@@ -19,6 +19,7 @@ yum -y install \
     gettext \
     less \
     openssl \
+    openssl-devel \
     zlib-devel \
     pcre2-devel \
     boost-devel \
