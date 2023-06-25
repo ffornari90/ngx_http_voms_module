@@ -27,18 +27,6 @@ RUN yum install -y yum-utils device-mapper-persistent-data lvm2 && \
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
     yum install -y docker-ce docker-ce-cli containerd.io
 
-COPY artifacts/*.rpm /pkgs/
-
-# install nginx httpg + voms and njs dynamic modules (latest version)
-COPY nginx.repo /etc/yum.repos.d/nginx.repo
-RUN rpm -ivh /pkgs/nginx-httpg-1.24.0-1.el7.ngx.x86_64.rpm && \
-    rpm -ivh /pkgs/nginx-module-http-voms-1.24.0-1.el7.x86_64.rpm && \
-    yum install -y nginx-module-njs
-
-# install nginx + voms and njs dynamic modules
-# RUN yum -y install nginx nginx-module-njs && \
-#     rpm -ivh /pkgs/nginx-module-http-voms-1.24.0-1.el7.x86_64.rpm
-
 EXPOSE 80
 EXPOSE 443
 EXPOSE 8443
@@ -56,49 +44,79 @@ RUN yum install -y centos-release-scl && \
 
 RUN git clone https://github.com/kubernetes/ingress-nginx.git && \
     cd ingress-nginx && git checkout tags/controller-v1.5.1 && \
-    make build && mv rootfs/bin/amd64/* / && \
-    mv rootfs/etc/nginx/* /etc/nginx/ && \
-    cd .. && rm -rf ingress-nginx && \
-    setcap cap_net_bind_service+ep /nginx-ingress-controller && \
+    make build && \
+    sed -i "s/    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;\
+/#    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;/g" \
+    rootfs/etc/nginx/template/nginx.tmpl && \
+    mv rootfs/bin/amd64/* / && \
     mkdir -p /etc/ingress-controller && \
+    mkdir -p /etc/nginx/modules && \
     mkdir -p /etc/nginx/geoip && \
     mkdir -p /tmp/nginx && \
     mkdir -p /opt/nginx && \
+    mkdir -p /var/log/nginx && \
+    mkdir -p /var/lib/nginx && \
     mkdir -p /tmp/luajit2 && \
     mkdir -p /tmp/ngx_devel_kit && \
     mkdir -p /tmp/lua-nginx-module && \
     mkdir -p /tmp/lua-resty-core && \
     mkdir -p /tmp/lua-resty-lrucache && \
+    mkdir -p /tmp/stream-lua-nginx-module && \
+    mv rootfs/etc/nginx/* /etc/nginx/ && \
+    cd .. && rm -rf ingress-nginx && \
+    setcap cap_net_bind_service=+eip /nginx-ingress-controller && \
+    setcap cap_net_bind_service=+eip /wait-shutdown && \
+    setcap cap_net_bind_service=+eip /dbg && \
     chown nginx: -R /etc/ingress-controller && \
-    chown nginx: -R /etc/nginx && \
+    chown nginx: -R /var/log/nginx && \
+    chown nginx: -R /var/lib/nginx && \
     chown nginx: -R /tmp/nginx && \
     chown nginx: -R /opt/nginx
 
 ENV LUAJIT_LIB=/usr/local/lib/lua/5.1
 ENV LUAJIT_INC=/usr/local/include/luajit-2.1
 
-RUN NGINX_VERSION=$(nginx -V 2>&1 |sed -n -e 's/nginx version: //p' |cut -d'/' -f2); \
+RUN NGINX_VERSION=1.22.0 && \
     curl -L "http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" | tar -C /opt/nginx --strip-components=1 -xz && \
-    curl -L "https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20230410.tar.gz" | tar -C /tmp/luajit2 --strip-components=1 -xz && \
+    curl -L "https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20220915.tar.gz" | tar -C /tmp/luajit2 --strip-components=1 -xz && \
     curl -L "https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.2.tar.gz" | tar -C /tmp/ngx_devel_kit --strip-components=1 -xz && \
-    curl -L "https://github.com/openresty/lua-nginx-module/archive/refs/tags/v0.10.24.tar.gz" | tar -C /tmp/lua-nginx-module --strip-components=1 -xz && \
+    curl -L "https://github.com/openresty/lua-nginx-module/archive/refs/tags/v0.10.22.tar.gz" | tar -C /tmp/lua-nginx-module --strip-components=1 -xz && \
     curl -L "https://github.com/openresty/lua-resty-core/archive/refs/tags/v0.1.24.tar.gz" | tar -C /tmp/lua-resty-core --strip-components=1 -xz && \
-    curl -L "https://github.com/openresty/lua-resty-lrucache/archive/refs/tags/v0.13.tar.gz" | tar -C /tmp/lua-resty-lrucache --strip-components=1 -xz && \
+    curl -L "https://github.com/openresty/lua-resty-lrucache/archive/refs/tags/v0.13.tar.gz" | tar -C /tmp/lua-resty-lrucache --strip-components=1 -xz && \ 
+    curl -L "https://github.com/openresty/stream-lua-nginx-module/archive/refs/tags/v0.0.11.tar.gz" | tar -C /tmp/stream-lua-nginx-module --strip-components=1 -xz && \ 
+    curl -L "https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoIP.dat.gz" | gunzip -c > /etc/nginx/geoip/GeoIP.dat && \
+    curl -L "https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoIPASNum.dat.gz" | gunzip -c > /etc/nginx/geoip/GeoIPASNum.dat && \
+    curl -L "https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.xz" | xz -d > /etc/nginx/geoip/GeoLiteCity.dat && \
+    git clone https://baltig.infn.it/cnafsd/ngx_http_voms_module.git /tmp/ngx_http_voms_module && \
+    git clone https://github.com/openresty/headers-more-nginx-module.git /tmp/headers-more-nginx-module && \
     source /opt/rh/devtoolset-7/enable && \
     cd /tmp/luajit2 && make && make install && \
-    cd /opt/nginx &&  ./configure \
-    --with-ld-opt="-Wl,-rpath,/usr/local/lib/lua/5.1" \
+    cd /opt/nginx && ./configure \
+    --with-ld-opt="-Wl,-lpcre,-rpath,/usr/local/lib/lua/5.1" \
+    --add-module=/tmp/headers-more-nginx-module \
     --add-dynamic-module=/tmp/ngx_devel_kit \
     --add-dynamic-module=/tmp/lua-nginx-module \
-    --with-pcre --with-stream --with-http_ssl_module && \
+    --add-dynamic-module=/tmp/ngx_http_voms_module \
+    --with-pcre --with-stream --with-http_ssl_module \
+    --with-threads --with-http_geoip_module --with-stream \
+    --with-http_v2_module --with-http_stub_status_module \
+    --with-stream_ssl_module --add-module=/tmp/stream-lua-nginx-module && \
     make -j2 && make install && \
     cd /tmp/lua-resty-core && \
     make install PREFIX=/opt/nginx && \
     cd /tmp/lua-resty-lrucache && \
     make install PREFIX=/opt/nginx && \
+    ln -s /opt/nginx/lib/lua/ngx /etc/nginx/lua/ngx && \
+    ln -s /opt/nginx/lib/lua/resty /etc/nginx/lua/resty && \
     ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx && \
+    ln -s /usr/local/nginx/modules/ngx_http_voms_module.so /etc/nginx/modules/ngx_http_voms_module.so && \
     ln -s /usr/local/nginx/modules/ngx_http_lua_module.so /etc/nginx/modules/ngx_http_lua_module.so && \
     ln -s /usr/local/nginx/modules/ndk_http_module.so /etc/nginx/modules/ndk_http_module.so && \
-    chown nginx: -R /usr/local/nginx
+    ln -s /usr/local/nginx/conf /etc/nginx/conf && \
+    cp /etc/nginx/conf/mime.types /etc/nginx/ && \
+    chown nginx: -R /etc/nginx && \
+    chown nginx: -R /usr/local/nginx && \
+    setcap cap_net_bind_service=+eip /usr/local/nginx/sbin/nginx && \
+    ln -s /usr/local/lib/libluajit-5.1.so /usr/lib64/libluajit-5.1.so.2
 
 CMD ["/nginx-ingress-controller"]

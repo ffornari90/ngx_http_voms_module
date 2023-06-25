@@ -9,6 +9,7 @@ yum -y install epel-release
 yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
 
 yum -y install \
+    net-tools \
     hostname \
     which \
     wget \
@@ -34,4 +35,5 @@ yum -y install \
     cpan \
     voms-clients-java \
     git \
-    golang
+    golang \
+    geoip-devel
