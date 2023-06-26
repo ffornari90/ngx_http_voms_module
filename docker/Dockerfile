@@ -59,6 +59,13 @@ RUN git clone https://github.com/kubernetes/ingress-nginx.git && \
     mkdir -p /tmp/luajit2 && \
     mkdir -p /tmp/ngx_devel_kit && \
     mkdir -p /tmp/lua-nginx-module && \
+    mkdir -p /tmp/lua-cjson && \
+    mkdir -p /tmp/lua-resty-http && \
+    mkdir -p /tmp/lua-resty-dns && \
+    mkdir -p /tmp/lua-resty-global-throttle && \
+    mkdir -p /tmp/lua-resty-ipmatcher && \
+    mkdir -p /tmp/lua-resty-roundrobin && \
+    mkdir -p /tmp/lua-resty-cookie && \
     mkdir -p /tmp/lua-resty-core && \
     mkdir -p /tmp/lua-resty-lrucache && \
     mkdir -p /tmp/stream-lua-nginx-module && \
@@ -80,6 +87,13 @@ RUN NGINX_VERSION=1.22.0 && \
     curl -L "http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" | tar -C /opt/nginx --strip-components=1 -xz && \
     curl -L "https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20220915.tar.gz" | tar -C /tmp/luajit2 --strip-components=1 -xz && \
     curl -L "https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.2.tar.gz" | tar -C /tmp/ngx_devel_kit --strip-components=1 -xz && \
+    curl -L "https://github.com/openresty/lua-cjson/archive/refs/tags/2.1.0.9.tar.gz" | tar -C /tmp/lua-cjson --strip-components=1 -xz && \ 
+    curl -L "https://github.com/ledgetech/lua-resty-http/archive/refs/tags/v0.17.0-beta.1.tar.gz" | tar -C /tmp/lua-resty-http --strip-components=1 -xz && \ 
+    curl -L "https://github.com/openresty/lua-resty-dns/archive/refs/tags/v0.22.tar.gz" | tar -C /tmp/lua-resty-dns --strip-components=1 -xz && \ 
+    curl -L "https://github.com/ElvinEfendi/lua-resty-global-throttle/archive/refs/tags/v0.2.0.tar.gz" | tar -C /tmp/lua-resty-global-throttle --strip-components=1 -xz && \ 
+    curl -L "https://github.com/api7/lua-resty-ipmatcher/archive/refs/tags/v0.6.1.tar.gz" | tar -C /tmp/lua-resty-ipmatcher --strip-components=1 -xz && \ 
+    curl -L "https://github.com/openresty/lua-resty-balancer/archive/refs/tags/v0.04.tar.gz" | tar -C /tmp/lua-resty-roundrobin --strip-components=1 -xz && \ 
+    curl -L "https://github.com/cloudflare/lua-resty-cookie/archive/refs/tags/v0.1.0.tar.gz" | tar -C /tmp/lua-resty-cookie --strip-components=1 -xz && \ 
     curl -L "https://github.com/openresty/lua-nginx-module/archive/refs/tags/v0.10.22.tar.gz" | tar -C /tmp/lua-nginx-module --strip-components=1 -xz && \
     curl -L "https://github.com/openresty/lua-resty-core/archive/refs/tags/v0.1.24.tar.gz" | tar -C /tmp/lua-resty-core --strip-components=1 -xz && \
     curl -L "https://github.com/openresty/lua-resty-lrucache/archive/refs/tags/v0.13.tar.gz" | tar -C /tmp/lua-resty-lrucache --strip-components=1 -xz && \ 
@@ -102,6 +116,23 @@ RUN NGINX_VERSION=1.22.0 && \
     --with-http_v2_module --with-http_stub_status_module \
     --with-stream_ssl_module --add-module=/tmp/stream-lua-nginx-module && \
     make -j2 && make install && \
+    cd /tmp/lua-cjson && \
+    mkdir build && cd build && \
+    cmake3 -DLUA_INCLUDE_DIR=/usr/local/include/luajit-2.1 .. && \
+    make && make install && \
+    cd /tmp/lua-resty-http && \
+    make install PREFIX=/opt/nginx && \
+    cd /tmp/lua-resty-dns && \
+    make install PREFIX=/opt/nginx && \
+    cd /tmp/lua-resty-global-throttle && \
+    make install PREFIX=/opt/nginx && \
+    cd /tmp/lua-resty-roundrobin && \
+    make && make install && \
+    cd /tmp/lua-resty-cookie && \
+    make && make install && \
+    cd /tmp/lua-resty-ipmatcher && \
+    make install && chmod +x resty/ipmatcher.lua && \
+    cp resty/ipmatcher.lua /opt/nginx/lib/lua/resty/ && \
     cd /tmp/lua-resty-core && \
     make install PREFIX=/opt/nginx && \
     cd /tmp/lua-resty-lrucache && \
@@ -117,6 +148,8 @@ RUN NGINX_VERSION=1.22.0 && \
     chown nginx: -R /etc/nginx && \
     chown nginx: -R /usr/local/nginx && \
     setcap cap_net_bind_service=+eip /usr/local/nginx/sbin/nginx && \
-    ln -s /usr/local/lib/libluajit-5.1.so /usr/lib64/libluajit-5.1.so.2
+    ln -s /usr/local/lib/libluajit-5.1.so /usr/lib64/libluajit-5.1.so.2 && \
+    ln -s /usr/lib64/lua/5.1/cjson.so /usr/local/lib/lua/5.1/cjson.so && \
+    cp -r /usr/local/lib/lua/resty/* /etc/nginx/lua/resty/
 
 CMD ["/nginx-ingress-controller"]
