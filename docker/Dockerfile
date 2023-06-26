@@ -48,6 +48,8 @@ RUN git clone https://github.com/kubernetes/ingress-nginx.git && \
     sed -i "s/    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;\
 /#    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;/g" \
     rootfs/etc/nginx/template/nginx.tmpl && \
+    sed -i '/    lua_package_path "\/etc\/nginx\/lua\/?.lua;;";/a \ \ \ \ lua_package_cpath "\/usr\/local\/lib\/lua\/?.so;;";' \
+    rootfs/etc/nginx/template/nginx.tmpl && \
     mv rootfs/bin/amd64/* / && \
     mkdir -p /etc/ingress-controller && \
     mkdir -p /etc/nginx/modules && \
@@ -66,6 +68,7 @@ RUN git clone https://github.com/kubernetes/ingress-nginx.git && \
     mkdir -p /tmp/lua-resty-ipmatcher && \
     mkdir -p /tmp/lua-resty-roundrobin && \
     mkdir -p /tmp/lua-resty-cookie && \
+    mkdir -p /tmp/lua-resty-lock && \
     mkdir -p /tmp/lua-resty-core && \
     mkdir -p /tmp/lua-resty-lrucache && \
     mkdir -p /tmp/stream-lua-nginx-module && \
@@ -94,6 +97,7 @@ RUN NGINX_VERSION=1.22.0 && \
     curl -L "https://github.com/api7/lua-resty-ipmatcher/archive/refs/tags/v0.6.1.tar.gz" | tar -C /tmp/lua-resty-ipmatcher --strip-components=1 -xz && \ 
     curl -L "https://github.com/openresty/lua-resty-balancer/archive/refs/tags/v0.04.tar.gz" | tar -C /tmp/lua-resty-roundrobin --strip-components=1 -xz && \ 
     curl -L "https://github.com/cloudflare/lua-resty-cookie/archive/refs/tags/v0.1.0.tar.gz" | tar -C /tmp/lua-resty-cookie --strip-components=1 -xz && \ 
+    curl -L "https://github.com/openresty/lua-resty-lock/archive/refs/tags/v0.09.tar.gz" | tar -C /tmp/lua-resty-lock --strip-components=1 -xz && \ 
     curl -L "https://github.com/openresty/lua-nginx-module/archive/refs/tags/v0.10.22.tar.gz" | tar -C /tmp/lua-nginx-module --strip-components=1 -xz && \
     curl -L "https://github.com/openresty/lua-resty-core/archive/refs/tags/v0.1.24.tar.gz" | tar -C /tmp/lua-resty-core --strip-components=1 -xz && \
     curl -L "https://github.com/openresty/lua-resty-lrucache/archive/refs/tags/v0.13.tar.gz" | tar -C /tmp/lua-resty-lrucache --strip-components=1 -xz && \ 
@@ -129,6 +133,8 @@ RUN NGINX_VERSION=1.22.0 && \
     cd /tmp/lua-resty-roundrobin && \
     make && make install && \
     cd /tmp/lua-resty-cookie && \
+    make && make install && \
+    cd /tmp/lua-resty-lock && \
     make && make install && \
     cd /tmp/lua-resty-ipmatcher && \
     make install && chmod +x resty/ipmatcher.lua && \
