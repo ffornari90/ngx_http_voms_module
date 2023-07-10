@@ -6,6 +6,9 @@ FROM centos:7
 ENV DOCKER_IN_DOCKER_ENABLED=true
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/go/bin
 ENV LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/opt/nginx/lib:/opt/nginx/auto/lib
+ENV LUAJIT_LIB=/usr/local/lib/lua/5.1
+ENV LUAJIT_INC=/usr/local/include/luajit-2.1
+ENV NGINX_VERSION=1.22.0
 
 VOLUME /var/run/docker.sock:/var/run/docker.sock
 
@@ -14,6 +17,12 @@ ARG USERNAME=nginx
 ARG USER_UID=101
 ARG USER_GID=${USER_UID}
 
+EXPOSE 80
+EXPOSE 443
+EXPOSE 8443
+
+STOPSIGNAL SIGQUIT
+
 # install dependencies
 COPY library-scripts/*.sh /tmp/library-scripts/
 
@@ -21,28 +30,17 @@ RUN yum update -y && \
     sh /tmp/library-scripts/provide-deps.sh && \
     sh /tmp/library-scripts/provide-user.sh ${USERNAME} ${USER_UID} ${USER_GID} && \
     mkdir /pkgs && \
-    yum clean all && rm -rf /var/cache/yum
-
-RUN yum install -y yum-utils device-mapper-persistent-data lvm2 && \
+    yum install -y yum-utils device-mapper-persistent-data lvm2 centos-release-scl && \
     yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
-    yum install -y docker-ce docker-ce-cli containerd.io
-
-EXPOSE 80
-EXPOSE 443
-EXPOSE 8443
-
-STOPSIGNAL SIGQUIT
-
-RUN yum install -y centos-release-scl && \
-    yum install -y devtoolset-7 cmake3 && \
+    yum install -y docker-ce docker-ce-cli containerd.io devtoolset-7 cmake3 && \
+    yum clean all && rm -rf /var/cache/yum && \
     source /opt/rh/devtoolset-7/enable && \
     git clone https://github.com/microsoft/mimalloc.git && \
     cd mimalloc && mkdir build && cd build && \
     cmake3 .. && make && make install && \
     ln -s /usr/local/lib64/libmimalloc.so /usr/local/lib/libmimalloc.so && \
-    cd ../.. && rm -rf mimalloc
-
-RUN git clone https://github.com/kubernetes/ingress-nginx.git && \
+    cd ../.. && rm -rf mimalloc && \
+    git clone https://github.com/kubernetes/ingress-nginx.git && \
     cd ingress-nginx && git checkout tags/controller-v1.5.1 && \
     make build && \
     sed -i "s/    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;\
@@ -81,12 +79,7 @@ RUN git clone https://github.com/kubernetes/ingress-nginx.git && \
     chown nginx: -R /var/log/nginx && \
     chown nginx: -R /var/lib/nginx && \
     chown nginx: -R /tmp/nginx && \
-    chown nginx: -R /opt/nginx
-
-ENV LUAJIT_LIB=/usr/local/lib/lua/5.1
-ENV LUAJIT_INC=/usr/local/include/luajit-2.1
-
-RUN NGINX_VERSION=1.22.0 && \
+    chown nginx: -R /opt/nginx && \
     curl -L "http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" | tar -C /opt/nginx --strip-components=1 -xz && \
     curl -L "https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20220915.tar.gz" | tar -C /tmp/luajit2 --strip-components=1 -xz && \
     curl -L "https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.2.tar.gz" | tar -C /tmp/ngx_devel_kit --strip-components=1 -xz && \
@@ -107,7 +100,6 @@ RUN NGINX_VERSION=1.22.0 && \
     curl -L "https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.xz" | xz -d > /etc/nginx/geoip/GeoLiteCity.dat && \
     git clone https://baltig.infn.it/cnafsd/ngx_http_voms_module.git /tmp/ngx_http_voms_module && \
     git clone https://github.com/openresty/headers-more-nginx-module.git /tmp/headers-more-nginx-module && \
-    source /opt/rh/devtoolset-7/enable && \
     cd /tmp/luajit2 && make && make install && \
     cd /opt/nginx && ./configure \
     --with-ld-opt="-Wl,-lpcre,-rpath,/usr/local/lib/lua/5.1" \
@@ -156,6 +148,31 @@ RUN NGINX_VERSION=1.22.0 && \
     setcap cap_net_bind_service=+eip /usr/local/nginx/sbin/nginx && \
     ln -s /usr/local/lib/libluajit-5.1.so /usr/lib64/libluajit-5.1.so.2 && \
     ln -s /usr/lib64/lua/5.1/cjson.so /usr/local/lib/lua/5.1/cjson.so && \
-    cp -r /usr/local/lib/lua/resty/* /etc/nginx/lua/resty/
+    cp -r /usr/local/lib/lua/resty/* /etc/nginx/lua/resty/ && \
+    rm -rf /tmp/lua* /tmp/ngx* /tmp/stream*
+
+RUN curl -L "http://repository.egi.eu/sw/production/cas/1/current/tgz/" -o index.html && \
+    mkdir -p tgz /etc/grid-security/certificates && \
+    for tgz in $(cat index.html | awk -F'"' '{print $2}' | grep tar.gz); \
+    do curl -L "http://repository.egi.eu/sw/production/cas/1/current/tgz/$tgz" -o tgz/$tgz; \
+    done && for tgz in $(ls tgz/); do tar xzf tgz/$tgz --strip-components=1 -C /etc/grid-security/certificates/; \
+    done && for f in $(find /etc/grid-security/certificates/ -type f -name "*.pem"); \
+    do cat $f >> /etc/ssl/certs/ca-certificates.crt; done && \
+    curl -L "https://crt.sh/?d=2475254782" -o /etc/ssl/certs/geant-ov-rsa-ca.crt && \
+    cat /etc/ssl/certs/geant-ov-rsa-ca.crt >> /etc/ssl/certs/ca-certificates.crt && rm -rf tgz && \
+    mkdir -p /etc/grid-security/vomsdir/juno && \
+    mkdir -p /etc/vomses/ && \
+    echo '"juno" "lcgvoms02.jinr.ru" "15008" "/C=RU/O=RDIG/OU=hosts/OU=jinr.ru/CN=lcgvoms02.jinr.ru" "juno" "24"' \
+    | tee /etc/vomses/juno-lcgvoms02.jinr.ru && \
+    echo '"juno" "voms.ihep.ac.cn" "15008" "/C=CN/O=HEP/OU=CC/O=IHEP/CN=voms.ihep.ac.cn" "juno" "24"' \
+    | tee /etc/vomses/juno-voms.ihep.ac.cn && \
+    echo '"juno" "voms-juno.cloud.cnaf.infn.it" "15008" "/DC=org/DC=terena/DC=tcs/C=IT/ST=Roma/O=Istituto Nazionale di Fisica Nucleare/CN=voms-juno.cloud.cnaf.infn.it" "juno" "24"' \
+    | tee /etc/vomses/juno-voms-juno.cloud.cnaf.infn.it && \
+    echo $'/C=RU/O=RDIG/OU=hosts/OU=jinr.ru/CN=lcgvoms02.jinr.ru \n\
+/C=RU/O=RDIG/CN=Russian Data-Intensive Grid CA' | tee /etc/grid-security/vomsdir/juno/lcgvoms02.jinr.ru.lsc && \
+    echo $'/C=CN/O=HEP/OU=CC/O=IHEP/CN=voms.ihep.ac.cn \n\
+/C=CN/O=HEP/CN=Institute of High Energy Physics Certification Authority' | tee /etc/grid-security/vomsdir/juno/voms.ihep.ac.cn.lsc && \
+    echo $'/DC=org/DC=terena/DC=tcs/C=IT/ST=Roma/O=Istituto Nazionale di Fisica Nucleare/CN=voms-juno.cloud.cnaf.infn.it \n\
+/C=NL/O=GEANT Vereniging/CN=GEANT eScience SSL CA 4' | tee /etc/grid-security/vomsdir/juno/voms-juno.cloud.cnaf.infn.it.lsc
 
 CMD ["/nginx-ingress-controller"]

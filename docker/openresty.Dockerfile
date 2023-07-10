@@ -5,10 +5,11 @@ FROM centos:7
 
 ENV DOCKER_IN_DOCKER_ENABLED=true
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/go/bin
-ENV LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/opt/nginx/lib:/opt/nginx/auto/lib
-ENV LUAJIT_LIB=/usr/local/lib/lua/5.1
-ENV LUAJIT_INC=/usr/local/include/luajit-2.1
-ENV NGINX_VERSION=1.19.3.2
+ENV LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64:/usr/local/lib/lua
+ENV LUAJIT_LIB=/usr/local/openresty/luajit/lib
+ENV LUAJIT_INC=/usr/local/openresty/luajit/include/luajit-2.1
+ENV NGINX_VERSION=1.19.9.1
+ENV CONTROLLER_VERSION=1.1.2
 
 VOLUME /var/run/docker.sock:/var/run/docker.sock
 
@@ -41,12 +42,14 @@ RUN yum update -y && \
     ln -s /usr/local/lib64/libmimalloc.so /usr/local/lib/libmimalloc.so && \
     cd ../.. && rm -rf mimalloc && \
     git clone https://github.com/kubernetes/ingress-nginx.git && \
-    cd ingress-nginx && git checkout tags/controller-v1.5.1 && \
+    cd ingress-nginx && git checkout tags/controller-v${CONTROLLER_VERSION} && \
     make build && \
-    sed -i "s/    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;\
-/#    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;/g" \
+#    sed -i "s/    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;\
+#/#    ajp_temp_path                   \/tmp\/nginx\/ajp-temp;/g" \
+    sed -i "s/    ajp_temp_path                   \/tmp\/ajp-temp;\
+/#    ajp_temp_path                   \/tmp\/ajp-temp;/g" \
     rootfs/etc/nginx/template/nginx.tmpl && \
-    sed -i '/    lua_package_path "\/etc\/nginx\/lua\/?.lua;;";/a \ \ \ \ lua_package_cpath "\/usr\/local\/lib\/lua\/?.so;;";' \
+    sed -i '/    lua_package_path "\/etc\/nginx\/lua\/?.lua;;";/a \ \ \ \ lua_package_cpath "\/usr\/local\/openresty\/lualib\/?.so;;";' \
     rootfs/etc/nginx/template/nginx.tmpl && \
     mv rootfs/bin/amd64/* / && \
     mkdir -p /etc/ingress-controller && \
@@ -59,16 +62,11 @@ RUN yum update -y && \
     mkdir -p /tmp/luajit2 && \
     mkdir -p /tmp/ngx_devel_kit && \
     mkdir -p /tmp/lua-nginx-module && \
-    mkdir -p /tmp/lua-cjson && \
     mkdir -p /tmp/lua-resty-http && \
-    mkdir -p /tmp/lua-resty-dns && \
     mkdir -p /tmp/lua-resty-global-throttle && \
     mkdir -p /tmp/lua-resty-ipmatcher && \
     mkdir -p /tmp/lua-resty-roundrobin && \
     mkdir -p /tmp/lua-resty-cookie && \
-    mkdir -p /tmp/lua-resty-lock && \
-    mkdir -p /tmp/lua-resty-core && \
-    mkdir -p /tmp/lua-resty-lrucache && \
     mkdir -p /tmp/stream-lua-nginx-module && \
     mv rootfs/etc/nginx/* /etc/nginx/ && \
     cd .. && rm -rf ingress-nginx && \
@@ -82,38 +80,66 @@ RUN yum update -y && \
     chown nginx: -R /opt/nginx
 
 RUN curl -L "http://openresty.org/download/openresty-${NGINX_VERSION}.tar.gz" | tar -C /opt/nginx --strip-components=1 -xz && \
-    curl -L "https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20220915.tar.gz" | tar -C /tmp/luajit2 --strip-components=1 -xz && \
-    curl -L "https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.2.tar.gz" | tar -C /tmp/ngx_devel_kit --strip-components=1 -xz && \
-    curl -L "https://github.com/openresty/lua-nginx-module/archive/refs/tags/v0.10.20.tar.gz" | tar -C /tmp/lua-nginx-module --strip-components=1 -xz && \
+    curl -L "https://github.com/ledgetech/lua-resty-http/archive/refs/tags/v0.17.1.tar.gz" | tar -C /tmp/lua-resty-http --strip-components=1 -xz && \ 
+    curl -L "https://github.com/ElvinEfendi/lua-resty-global-throttle/archive/refs/tags/v0.2.0.tar.gz" | tar -C /tmp/lua-resty-global-throttle --strip-components=1 -xz && \ 
+    curl -L "https://github.com/api7/lua-resty-ipmatcher/archive/refs/tags/v0.6.1.tar.gz" | tar -C /tmp/lua-resty-ipmatcher --strip-components=1 -xz && \ 
+    curl -L "https://github.com/openresty/lua-resty-balancer/archive/refs/tags/v0.04.tar.gz" | tar -C /tmp/lua-resty-roundrobin --strip-components=1 -xz && \ 
+    curl -L "https://github.com/cloudflare/lua-resty-cookie/archive/refs/tags/v0.1.0.tar.gz" | tar -C /tmp/lua-resty-cookie --strip-components=1 -xz && \ 
+    curl -L "https://github.com/openresty/stream-lua-nginx-module/archive/refs/tags/v0.0.13.tar.gz" | tar -C /tmp/stream-lua-nginx-module --strip-components=1 -xz && \
     curl -L "https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoIP.dat.gz" | gunzip -c > /etc/nginx/geoip/GeoIP.dat && \
     curl -L "https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoIPASNum.dat.gz" | gunzip -c > /etc/nginx/geoip/GeoIPASNum.dat && \
     curl -L "https://mirrors-cdn.liferay.com/geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.xz" | xz -d > /etc/nginx/geoip/GeoLiteCity.dat && \
     git clone https://baltig.infn.it/cnafsd/ngx_http_voms_module.git /tmp/ngx_http_voms_module && \
-    cd /tmp/luajit2 && make && make install && \
     cd /opt/nginx && ./configure \
-    --with-ld-opt="-Wl,-lpcre,-rpath,/usr/local/lib/lua/5.1" \
-    --add-dynamic-module=/tmp/ngx_devel_kit \
-    --add-dynamic-module=/tmp/lua-nginx-module \
-    --add-dynamic-module=/tmp/ngx_http_voms_module \
-    --with-pcre --with-stream --with-http_ssl_module \
-    --with-threads --with-http_geoip_module --with-stream \
-    --with-http_v2_module --with-http_stub_status_module \
-    --with-stream_ssl_module \
-    && \
+    --add-module=/tmp/ngx_http_voms_module \
+    --with-http_iconv_module \
+    --with-http_ssl_module \
+    --with-http_v2_module \
+    --with-http_realip_module \
+    --with-http_addition_module \
+    --with-http_geoip_module \
+    --with-http_sub_module \
+    --with-http_dav_module \
+    --with-http_flv_module \
+    --with-http_mp4_module \
+    --with-http_gunzip_module \
+    --with-http_gzip_static_module \
+    --with-http_auth_request_module \
+    --with-http_random_index_module \
+    --with-http_secure_link_module \
+    --with-http_degradation_module \
+    --with-http_slice_module \
+    --with-http_stub_status_module \
+    --with-http_perl_module \
+    --with-pcre --with-stream \
+    --with-threads --with-stream_ssl_module && \
     make -j2 && make install && \
-    ln -s /opt/nginx/lib/lua/ngx /etc/nginx/lua/ngx && \
-    ln -s /opt/nginx/lib/lua/resty /etc/nginx/lua/resty && \
-    ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx && \
-    ln -s /usr/local/nginx/modules/ngx_http_voms_module.so /etc/nginx/modules/ngx_http_voms_module.so && \
-    ln -s /usr/local/nginx/modules/ngx_http_lua_module.so /etc/nginx/modules/ngx_http_lua_module.so && \
-    ln -s /usr/local/nginx/modules/ndk_http_module.so /etc/nginx/modules/ndk_http_module.so && \
-    ln -s /usr/local/nginx/conf /etc/nginx/conf && \
+    cd /tmp/lua-resty-http && \
+    make install PREFIX=/opt/nginx && \
+    cd /tmp/lua-resty-global-throttle && \
+    make install PREFIX=/opt/nginx && \
+    cd /tmp/lua-resty-roundrobin && \
+    make && make install && \
+    cd /tmp/lua-resty-cookie && \
+    make && make install && \
+    cd /tmp/lua-resty-ipmatcher && \
+    make install && chmod +x resty/ipmatcher.lua && \
+    cp resty/ipmatcher.lua /opt/nginx/lib/lua/resty/ && \
+    ln -s /usr/local/openresty/lualib/ngx /etc/nginx/lua/ngx && \
+    ln -s /usr/local/openresty/lualib/resty /etc/nginx/lua/resty && \
+    ln -s /usr/local/openresty/nginx /usr/local/nginx && \
+    ln -s /usr/local/openresty/nginx/sbin/nginx /usr/bin/nginx && \
+    ln -s /usr/local/openresty/nginx/conf /etc/nginx/conf && \
+    cp /usr/local/openresty/nginx/conf/mime.types /etc/nginx/ && \
     chown nginx: -R /etc/nginx && \
     chown nginx: -R /usr/local/openresty && \
     setcap cap_net_bind_service=+eip /usr/local/openresty/nginx/sbin/nginx && \
-    ln -s /usr/local/lib/libluajit-5.1.so /usr/lib64/libluajit-5.1.so.2 && \
-    ln -s /usr/lib64/lua/5.1/cjson.so /usr/local/lib/lua/5.1/cjson.so && \
-    rm -rf /tmp/lua* /tmp/ngx* /tmp/stream*
+    ln -s /usr/local/openresty/luajit/lib/libluajit-5.1.so.2.1.0 /usr/lib64/libluajit-5.1.so.2 && \
+    ln -s /usr/local/lib/lua/librestychash.so /usr/local/openresty/lualib/librestychash.so && \
+    cp -r /usr/local/openresty/lualib/* /usr/local/openresty/luajit/share/lua/5.1/ && \
+    cp -r /opt/nginx/lib/lua/resty/* /etc/nginx/lua/resty/ && \
+    cp -r /usr/local/lib/lua/resty/* /etc/nginx/lua/resty/ && \
+    rm -rf /tmp/lua* /tmp/ngx*
 
 RUN curl -L "http://repository.egi.eu/sw/production/cas/1/current/tgz/" -o index.html && \
     mkdir -p tgz /etc/grid-security/certificates && \
@@ -137,6 +163,8 @@ RUN curl -L "http://repository.egi.eu/sw/production/cas/1/current/tgz/" -o index
     echo $'/C=CN/O=HEP/OU=CC/O=IHEP/CN=voms.ihep.ac.cn \n\
 /C=CN/O=HEP/CN=Institute of High Energy Physics Certification Authority' | tee /etc/grid-security/vomsdir/juno/voms.ihep.ac.cn.lsc && \
     echo $'/DC=org/DC=terena/DC=tcs/C=IT/ST=Roma/O=Istituto Nazionale di Fisica Nucleare/CN=voms-juno.cloud.cnaf.infn.it \n\
-/C=NL/O=GEANT Vereniging/CN=GEANT eScience SSL CA 4' | tee /etc/grid-security/vomsdir/juno/voms-juno.cloud.cnaf.infn.it.lsc
+/C=NL/O=GEANT Vereniging/CN=GEANT eScience SSL CA 4' | tee /etc/grid-security/vomsdir/juno/voms-juno.cloud.cnaf.infn.it.lsc && \
+    ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime && \
+    echo "Europe/Rome" > /etc/timezone
 
 CMD ["/nginx-ingress-controller"]
